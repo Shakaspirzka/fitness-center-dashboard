@@ -68,17 +68,22 @@ selected_scenario = st.sidebar.selectbox(
 
 # Distribuție abonamente
 st.sidebar.subheader("Distribuție Abonamente (%)")
+st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. Poți seta orice valori - sistemul le va ajusta proporțional.")
+
 economic_pct = st.sidebar.slider(
     f"{SUBSCRIPTION_TYPES['economic']['name']} ({SUBSCRIPTION_TYPES['economic']['price']} RON)",
-    0, 100, 40, 5
+    0, 100, 40, 5,
+    help="Proporția clienților cu abonament economic. Se normalizează automat."
 )
 standard_pct = st.sidebar.slider(
     f"{SUBSCRIPTION_TYPES['standard']['name']} ({SUBSCRIPTION_TYPES['standard']['price']} RON)",
-    0, 100, 50, 5
+    0, 100, 50, 5,
+    help="Proporția clienților cu abonament standard. Se normalizează automat."
 )
 premium_pct = st.sidebar.slider(
     f"{SUBSCRIPTION_TYPES['premium']['name']} ({SUBSCRIPTION_TYPES['premium']['price']} RON)",
-    0, 100, 10, 5
+    0, 100, 10, 5,
+    help="Proporția clienților cu abonament premium. Se normalizează automat."
 )
 
 # Normalizare distribuție
@@ -86,6 +91,17 @@ total_pct = economic_pct + standard_pct + premium_pct
 if total_pct == 0:
     economic_pct, standard_pct, premium_pct = 33.33, 33.33, 33.34
     total_pct = 100
+
+# Calculează procentajele normalizate
+economic_normalized = (economic_pct / total_pct) * 100
+standard_normalized = (standard_pct / total_pct) * 100
+premium_normalized = (premium_pct / total_pct) * 100
+
+# Afișează procentajele normalizate
+if total_pct != 100:
+    st.sidebar.info(f"📊 **Distribuție normalizată:** Economic {economic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+else:
+    st.sidebar.success(f"✅ **Distribuție:** Economic {economic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
 
 subscription_distribution = {
     'economic': economic_pct / total_pct,
@@ -187,12 +203,20 @@ with tab1:
         st.write(f"**Rata ocupare:** {analysis['occupancy_rate']*100:.1f}%")
         
         st.markdown("### Distribuție Abonamente")
+        st.caption("💡 **Notă:** Procentajele sunt normalizate automat la 100% pentru calcule corecte.")
         dist_df = pd.DataFrame({
             'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in subscription_distribution.keys()],
             'Procentaj': [f"{v*100:.1f}%" for v in subscription_distribution.values()],
             'Preț (RON)': [SUBSCRIPTION_TYPES[k]['price'] for k in subscription_distribution.keys()]
         })
         st.dataframe(dist_df, use_container_width=True, hide_index=True)
+        
+        # Afișează suma pentru claritate
+        total_check = sum(subscription_distribution.values()) * 100
+        if abs(total_check - 100) < 0.01:
+            st.success(f"✅ **Suma procentajelor:** {total_check:.1f}% (normalizat automat)")
+        else:
+            st.warning(f"⚠️ **Suma procentajelor:** {total_check:.1f}%")
     
     with col2:
         st.markdown("### Clienți pe Tip Abonament")
