@@ -5,7 +5,7 @@ Dashboard interactiv pentru analiza potențialului unui spațiu de fitness și r
 ## 🌐 Versiune Live
 
 Dacă dashboard-ul este deployat pe Streamlit Cloud, poate fi accesat live la:
-- **Link**: [Adaugă link-ul tău aici după deploy]
+- **Link**: https://fintess-prieteniei.streamlit.app
 
 Pentru instrucțiuni de deploy, vezi: [`DEPLOY_GITHUB.md`](DEPLOY_GITHUB.md)
 
