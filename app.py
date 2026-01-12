@@ -15,7 +15,14 @@ from calculations import (
     OCCUPANCY_SCENARIOS,
     SUBSCRIPTION_TYPES,
     DESIRED_MONTHLY_REVENUE,
-    LOCATION
+    LOCATION,
+    COMPETITORS,
+    CAPACITY_PER_HOUR
+)
+from competitor_analysis import (
+    get_competitive_positioning,
+    get_competitors_comparison,
+    calculate_market_position
 )
 
 # Configurare pagină
@@ -66,47 +73,64 @@ selected_scenario = st.sidebar.selectbox(
     index=1  # Default: Mediu
 )
 
-# Distribuție abonamente
-st.sidebar.subheader("Distribuție Abonamente (%)")
-st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. Poți seta orice valori - sistemul le va ajusta proporțional.")
+# Distribuție servicii - Structură extinsă
+st.sidebar.subheader("Distribuție Servicii (%)")
+st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. Poți seta 0% pentru servicii nefolosite. PT/Reabilitare se plătește per sesiune.")
 
-economic_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['economic']['name']} ({SUBSCRIPTION_TYPES['economic']['price']} RON)",
+# Abonamente lunare
+basic_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['basic']['name']} ({SUBSCRIPTION_TYPES['basic']['price']} RON/lună)",
     0, 100, 40, 5,
-    help="Proporția clienților cu abonament economic. Se normalizează automat."
+    help=SUBSCRIPTION_TYPES['basic']['description']
 )
 standard_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['standard']['name']} ({SUBSCRIPTION_TYPES['standard']['price']} RON)",
-    0, 100, 50, 5,
-    help="Proporția clienților cu abonament standard. Se normalizează automat."
+    f"{SUBSCRIPTION_TYPES['standard']['name']} ({SUBSCRIPTION_TYPES['standard']['price']} RON/lună)",
+    0, 100, 40, 5,
+    help=SUBSCRIPTION_TYPES['standard']['description']
 )
 premium_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['premium']['name']} ({SUBSCRIPTION_TYPES['premium']['price']} RON)",
-    0, 100, 10, 5,
-    help="Proporția clienților cu abonament premium. Se normalizează automat."
+    f"{SUBSCRIPTION_TYPES['premium']['name']} ({SUBSCRIPTION_TYPES['premium']['price']} RON/lună)",
+    0, 100, 20, 5,
+    help=SUBSCRIPTION_TYPES['premium']['description']
 )
 
-# Normalizare distribuție
-total_pct = economic_pct + standard_pct + premium_pct
-if total_pct == 0:
-    economic_pct, standard_pct, premium_pct = 33.33, 33.33, 33.34
-    total_pct = 100
+# PT/Reabilitare (per sesiune, nu procentaj)
+st.sidebar.markdown("---")
+pt_sessions_per_month = st.sidebar.number_input(
+    "Sesiuni PT/Reabilitare pe lună",
+    min_value=0,
+    max_value=500,
+    value=0,
+    step=5,
+    help=f"Număr de sesiuni PT/Reabilitare pe lună ({SUBSCRIPTION_TYPES['pt_session']['price']} RON/sesiune)"
+)
+
+# Normalizare distribuție (doar pentru abonamente lunare)
+monthly_total = basic_pct + standard_pct + premium_pct
+if monthly_total == 0:
+    basic_pct, standard_pct, premium_pct = 33.33, 33.33, 33.34
+    monthly_total = 100
 
 # Calculează procentajele normalizate
-economic_normalized = (economic_pct / total_pct) * 100
-standard_normalized = (standard_pct / total_pct) * 100
-premium_normalized = (premium_pct / total_pct) * 100
+basic_normalized = (basic_pct / monthly_total) * 100
+standard_normalized = (standard_pct / monthly_total) * 100
+premium_normalized = (premium_pct / monthly_total) * 100
 
 # Afișează procentajele normalizate
-if total_pct != 100:
-    st.sidebar.info(f"📊 **Distribuție normalizată:** Economic {economic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+if monthly_total != 100:
+    st.sidebar.info(f"📊 **Distribuție normalizată:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
 else:
-    st.sidebar.success(f"✅ **Distribuție:** Economic {economic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+    st.sidebar.success(f"✅ **Distribuție:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+
+if pt_sessions_per_month > 0:
+    pt_revenue = pt_sessions_per_month * SUBSCRIPTION_TYPES['pt_session']['price']
+    st.sidebar.info(f"💰 **Venit PT/Reabilitare:** {pt_revenue:,.0f} RON/lună ({pt_sessions_per_month} sesiuni)")
 
 subscription_distribution = {
-    'economic': economic_pct / total_pct,
-    'standard': standard_pct / total_pct,
-    'premium': premium_pct / total_pct
+    'basic': basic_pct / monthly_total,
+    'standard': standard_pct / monthly_total,
+    'premium': premium_pct / monthly_total,
+    'pt_session': 0.01 if pt_sessions_per_month > 0 else 0  # Marker pentru PT
 }
 
 # Parametri demografici
@@ -136,7 +160,8 @@ analysis = get_scenario_analysis(
     selected_scenario,
     subscription_distribution,
     participation_rate,
-    population_density
+    population_density,
+    pt_sessions_per_month
 )
 
 # Ajustare pentru conversie în calculul campaniei
@@ -182,13 +207,14 @@ with col4:
     )
 
 # Tabs pentru diferite vizualizări
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊 Rezumat", 
     "💰 Venituri", 
     "👥 Clienți & Demografie", 
     "📈 Comparare Scenarii",
     "🗺️ Hartă Participare",
-    "🎯 Campanie"
+    "🎯 Campanie",
+    "🏆 Analiză Concurențială"
 ])
 
 with tab1:
@@ -232,9 +258,10 @@ with tab1:
             y='Număr Clienți',
             color='Tip Abonament',
             color_discrete_map={
-                SUBSCRIPTION_TYPES['economic']['name']: '#2ecc71',
+                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
                 SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c'
+                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
+                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
             }
         )
         fig_clients.update_layout(showlegend=False, height=300)
@@ -257,13 +284,13 @@ with tab2:
     with col1:
         # Grafic venituri pe tip abonament
         revenue_data = analysis['revenue']
+        # Obține doar tipurile cu venit > 0
+        active_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
+                       if k in revenue_data and revenue_data.get(k, 0) > 0]
+        
         revenue_df = pd.DataFrame({
-            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in ['economic', 'standard', 'premium']],
-            'Venit (RON)': [
-                revenue_data['economic'],
-                revenue_data['standard'],
-                revenue_data['premium']
-            ]
+            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in active_types],
+            'Venit (RON)': [revenue_data.get(k, 0) for k in active_types]
         })
         
         fig_revenue = px.pie(
@@ -273,9 +300,10 @@ with tab2:
             title="Distribuție Venituri pe Tip Abonament",
             color='Tip Abonament',
             color_discrete_map={
-                SUBSCRIPTION_TYPES['economic']['name']: '#2ecc71',
+                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
                 SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c'
+                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
+                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
             }
         )
         st.plotly_chart(fig_revenue, use_container_width=True)
@@ -298,25 +326,27 @@ with tab2:
         st.plotly_chart(fig_target, use_container_width=True)
         
         # Tabel detaliat venituri
-        revenue_detail = pd.DataFrame({
-            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in ['economic', 'standard', 'premium']],
-            'Clienți': [
-                revenue_data['clients']['economic'],
-                revenue_data['clients']['standard'],
-                revenue_data['clients']['premium']
-            ],
-            'Preț/Abonament (RON)': [
-                SUBSCRIPTION_TYPES['economic']['price'],
-                SUBSCRIPTION_TYPES['standard']['price'],
-                SUBSCRIPTION_TYPES['premium']['price']
-            ],
-            'Venit Total (RON)': [
-                revenue_data['economic'],
-                revenue_data['standard'],
-                revenue_data['premium']
-            ]
-        })
-        revenue_detail.loc[len(revenue_detail)] = ['TOTAL', revenue_detail['Clienți'].sum(), '', revenue_data['total']]
+        revenue_detail_data = []
+        for k in active_types:
+            if k in revenue_data['clients']:
+                clients_count = revenue_data['clients'].get(k, 0)
+                price = SUBSCRIPTION_TYPES[k]['price']
+                if SUBSCRIPTION_TYPES[k].get('is_session_based', False):
+                    price_label = f"{price} RON/sesiune"
+                else:
+                    price_label = f"{price} RON/lună"
+                
+                revenue_detail_data.append({
+                    'Tip Abonament': SUBSCRIPTION_TYPES[k]['name'],
+                    'Clienți/Sesiuni': clients_count,
+                    'Preț': price_label,
+                    'Venit Total (RON)': revenue_data.get(k, 0)
+                })
+        
+        revenue_detail = pd.DataFrame(revenue_detail_data)
+        if len(revenue_detail) > 0:
+            total_clients = revenue_detail['Clienți/Sesiuni'].sum()
+            revenue_detail.loc[len(revenue_detail)] = ['TOTAL', total_clients, '', revenue_data['total']]
         st.dataframe(revenue_detail, use_container_width=True, hide_index=True)
 
 with tab3:
@@ -326,25 +356,26 @@ with tab3:
     
     with col1:
         st.markdown("### Necesar Clienți")
+        clients_data = analysis['revenue']['clients']
+        active_client_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
+                              if k in clients_data and clients_data.get(k, 0) > 0]
+        
         clients_df = pd.DataFrame({
-            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in ['economic', 'standard', 'premium']],
-            'Număr Clienți': [
-                analysis['revenue']['clients']['economic'],
-                analysis['revenue']['clients']['standard'],
-                analysis['revenue']['clients']['premium']
-            ]
+            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in active_client_types],
+            'Număr Clienți/Sesiuni': [clients_data.get(k, 0) for k in active_client_types]
         })
         
         fig_clients_detailed = px.bar(
             clients_df,
             x='Tip Abonament',
-            y='Număr Clienți',
-            text='Număr Clienți',
+            y='Număr Clienți/Sesiuni',
+            text='Număr Clienți/Sesiuni',
             color='Tip Abonament',
             color_discrete_map={
-                SUBSCRIPTION_TYPES['economic']['name']: '#2ecc71',
+                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
                 SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c'
+                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
+                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
             }
         )
         fig_clients_detailed.update_traces(textposition='outside')
@@ -391,7 +422,8 @@ with tab4:
     comparison_df = compare_scenarios(
         subscription_distribution,
         participation_rate,
-        population_density
+        population_density,
+        pt_sessions_per_month
     )
     
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
@@ -725,6 +757,168 @@ with tab6:
         f"{estimated_campaign_cost:,.0f} RON",
         help="Costul estimat pentru a atinge populația țintă"
     )
+
+with tab7:
+    st.subheader("🏆 Analiză Concurențială & Poziționare Strategică")
+    
+    positioning = get_competitive_positioning()
+    competitors = get_competitors_comparison()
+    market_pos = calculate_market_position(analysis['total_clients'], CAPACITY_PER_HOUR)
+    
+    # Secțiune 1: Poziționare Strategică
+    st.markdown("### 🎯 Poziționare Strategică")
+    st.info(f"**{positioning['positioning']}**")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### ✅ Avantaje Competitive")
+        for advantage in positioning['key_advantages']:
+            st.write(f"• {advantage}")
+    
+    with col2:
+        st.markdown("#### ❌ Ce NU Facem")
+        for item in positioning['what_we_dont_do']:
+            st.write(f"• {item}")
+    
+    # Secțiune 2: Capacitate Optimă
+    st.markdown("### 📊 Capacitate Optimă")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Capacitate Simultană", positioning['optimal_capacity']['simultaneous'])
+    with col2:
+        st.metric("Ocupare Lansare", positioning['optimal_capacity']['launch_occupancy'])
+    with col3:
+        st.metric("Ocupare Maturitate", positioning['optimal_capacity']['mature_occupancy'])
+    with col4:
+        st.metric("⚠️ Prag Avertisment", positioning['optimal_capacity']['warning_threshold'])
+    
+    st.warning(f"**Notă:** Depășirea constantă a pragului de {positioning['optimal_capacity']['warning_threshold']} afectează negativ experiența și retenția.")
+    
+    # Secțiune 3: Comparare cu Concurenți
+    st.markdown("### 🏢 Comparare cu Concurenți")
+    
+    # Grafic comparativ capacitate
+    fig_capacity = go.Figure()
+    
+    colors_map = {'red': '#e74c3c', 'blue': '#3498db', 'green': '#2ecc71', 'purple': '#9b59b6'}
+    
+    for comp in competitors:
+        fig_capacity.add_trace(go.Bar(
+            x=[comp['name']],
+            y=[comp['capacity']],
+            name=comp['name'],
+            marker_color=colors_map.get(comp['color'], '#95a5a6')
+        ))
+    
+    # Adaugă noastre
+    fig_capacity.add_trace(go.Bar(
+        x=['Sala Noastră'],
+        y=[CAPACITY_PER_HOUR],
+        name='Sala Noastră',
+        marker_color='#9b59b6'
+    ))
+    
+    fig_capacity.update_layout(
+        title="Comparare Capacitate Simultană",
+        yaxis_title="Persoane",
+        showlegend=False,
+        height=400
+    )
+    st.plotly_chart(fig_capacity, use_container_width=True)
+    
+    # Tabel detaliat
+    display_df = pd.DataFrame({
+        'Tip': [c['name'] for c in competitors] + ['Sala Noastră (Aleea Prieteniei)'],
+        'Capacitate Simultană': [c['capacity'] for c in competitors] + [CAPACITY_PER_HOUR],
+        'Abonați Activi': [c['members'] for c in competitors] + [analysis['total_clients']],
+        'Model': [c['model'] for c in competitors] + [positioning['positioning']],
+        'Limitări': [c['limitation'] for c in competitors] + ['N/A - Model optimizat']
+    })
+    
+    st.dataframe(display_df, use_container_width=True, hide_index=True)
+    
+    # Secțiune 4: Poziționare în Piață
+    st.markdown("### 📈 Poziționare în Piață")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric(
+            "Cota Piață - Capacitate",
+            f"{market_pos['market_share_capacity_pct']:.1f}%",
+            help="Cota noastră de piață bazată pe capacitate"
+        )
+        st.write(f"**Capacitate noastră:** {market_pos['our_capacity']} persoane")
+        st.write(f"**Capacitate totală concurenți:** {market_pos['total_competitor_capacity']} persoane")
+    
+    with col2:
+        st.metric(
+            "Cota Piață - Membri",
+            f"{market_pos['market_share_members_pct']:.1f}%",
+            help="Cota noastră de piață bazată pe numărul de membri"
+        )
+        st.write(f"**Membri noștri:** {market_pos['our_members']}")
+        st.write(f"**Membri totali concurenți:** {market_pos['total_competitor_members']}")
+    
+    st.success(f"💡 **{market_pos['positioning_note']}**")
+    
+    # Secțiune 5: Raza de Influență
+    st.markdown("### 🗺️ Raza de Influență")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.info(f"""
+        **Raza estimată:** {positioning['influence_radius']['estimated']}
+        
+        **Zonă primară (60% clienți):**
+        - Primii 500-700m
+        - Acces pietonal
+        - Proximitate maximă
+        
+        **Zonă secundară (40% clienți):**
+        - Prin recomandări
+        - Retenție
+        - Servicii specializate
+        """)
+    
+    with col2:
+        # Grafic distribuție pe zone
+        zones_data = pd.DataFrame({
+            'Zonă': ['Primară (500-700m)', 'Secundară (recomandări)'],
+            'Procentaj Clienți': [60, 40]
+        })
+        
+        fig_zones = px.pie(
+            zones_data,
+            values='Procentaj Clienți',
+            names='Zonă',
+            title="Distribuție Clienți pe Zone"
+        )
+        st.plotly_chart(fig_zones, use_container_width=True)
+    
+    # Secțiune 6: Verdict Final
+    st.markdown("### ✅ Verdict Final")
+    
+    verdict_items = [
+        "✅ Locația este validată",
+        "✅ Capacitatea este corect dimensionată",
+        "✅ Modelul este matur și sustenabil",
+        "✅ Poziționarea optimă este anti-aglomerație, nu anti-preț"
+    ]
+    
+    for item in verdict_items:
+        st.write(item)
+    
+    st.markdown("---")
+    st.markdown("""
+    **Concluzie Strategică:**
+    
+    Analiza per locație confirmă că majoritatea sălilor mari din zonă funcționează constant la sau peste limita optimă de confort. 
+    Noua sală nu concurează cu acestea pe volum sau preț, ci ocupă un gol clar de piață, definit de control, calitate și proximitate.
+    """)
 
 # Footer
 st.markdown("---")
