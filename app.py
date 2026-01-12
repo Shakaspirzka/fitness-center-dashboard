@@ -22,7 +22,12 @@ from calculations import (
 from competitor_analysis import (
     get_competitive_positioning,
     get_competitors_comparison,
-    calculate_market_position
+    calculate_market_position,
+    get_layout_comparison,
+    get_recommended_layout,
+    simulate_new_redgym_impact,
+    calculate_profitability_comparison,
+    COMFORT_THRESHOLDS
 )
 
 # Configurare pagină
@@ -899,7 +904,236 @@ with tab7:
         )
         st.plotly_chart(fig_zones, use_container_width=True)
     
-    # Secțiune 6: Verdict Final
+    # Secțiune 6: Layout Comparativ (mp/om)
+    st.markdown("### 📐 Layout Comparativ (mp/om)")
+    
+    st.markdown("""
+    **De ce contează mp/om?**
+    
+    În fitness, confortul perceput ≠ mp total, ci: **câți metri pătrați revin fiecărui utilizator simultan**
+    
+    - **Sub ~6 mp/om** → Aglomerație
+    - **8–10 mp/om** → Acceptabil
+    - **12+ mp/om** → Premium / Control
+    """)
+    
+    # Input pentru suprafața noastră
+    our_area_m2 = st.number_input(
+        "Suprafața Sălii Noastre (mp)",
+        min_value=300,
+        max_value=500,
+        value=400,
+        step=10,
+        help="Suprafața totală a sălii (350-450 mp recomandat)",
+        key="our_area_m2"
+    )
+    
+    layout_comparison = get_layout_comparison(our_area_m2, CAPACITY_PER_HOUR)
+    layout_df = pd.DataFrame(layout_comparison)
+    
+    # Grafic mp/om
+    fig_m2_per_person = go.Figure()
+    
+    colors_map = {'red': '#e74c3c', 'blue': '#3498db', 'green': '#2ecc71', 'purple': '#9b59b6'}
+    
+    for _, row in layout_df.iterrows():
+        color = colors_map.get(row['Color'], '#95a5a6')
+        fig_m2_per_person.add_trace(go.Bar(
+            x=[row['Locație']],
+            y=[row['mp/om']],
+            name=row['Locație'],
+            marker_color=color,
+            text=f"{row['mp/om']} mp/om",
+            textposition='auto'
+        ))
+    
+    # Adaugă linii de prag
+    fig_m2_per_person.add_hline(y=6, line_dash="dash", line_color="red", 
+                                annotation_text="Prag aglomerație (<6 mp/om)")
+    fig_m2_per_person.add_hline(y=8, line_dash="dash", line_color="orange", 
+                                annotation_text="Prag acceptabil (8 mp/om)")
+    fig_m2_per_person.add_hline(y=12, line_dash="dash", line_color="green", 
+                                annotation_text="Prag premium (12+ mp/om)")
+    
+    fig_m2_per_person.update_layout(
+        title="Comparare mp/om - Confort per Locație",
+        yaxis_title="mp/om",
+        xaxis_title="Locație",
+        showlegend=False,
+        height=500
+    )
+    st.plotly_chart(fig_m2_per_person, use_container_width=True)
+    
+    # Tabel detaliat
+    st.dataframe(
+        layout_df[['Locație', 'Suprafață (mp)', 'Oameni Simultan', 'mp/om', 'Experiență']],
+        use_container_width=True,
+        hide_index=True
+    )
+    
+    # Insight critic
+    st.info("""
+    🔑 **Insight critic:**
+    
+    Toate sălile mari din Bacău sunt sub pragul de confort la orele dorite de oameni.
+    
+    👉 Tu NU trebuie să spui: "avem aparate noi"
+    
+    👉 Tu spui: "nu stai la coadă"
+    """)
+    
+    # Secțiune 7: Layout Recomandat
+    st.markdown("### 🏗️ Layout Recomandat pentru Sala Noastră")
+    
+    layout_recommended = get_recommended_layout()
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(f"**Suprafață totală:** {layout_recommended['total_area_m2']} mp")
+        st.markdown(f"**Capacitate țintă:** {layout_recommended['target_capacity']['min']}-{layout_recommended['target_capacity']['max']} persoane")
+        st.markdown(f"**mp/om țintă:** {layout_recommended['m2_per_person_range']['min']}-{layout_recommended['m2_per_person_range']['max']} mp/om")
+    
+    with col2:
+        # Grafic distribuție spațiu
+        layout_dist_data = []
+        for key, value in layout_recommended['distribution'].items():
+            layout_dist_data.append({
+                'Zonă': value['description'],
+                'Procentaj': value['percentage'],
+                'Suprafață (mp)': value['m2']
+            })
+        
+        layout_dist_df = pd.DataFrame(layout_dist_data)
+        
+        fig_layout = px.pie(
+            layout_dist_df,
+            values='Suprafață (mp)',
+            names='Zonă',
+            title="Distribuție Spațiu Recomandată",
+            hover_data=['Procentaj']
+        )
+        st.plotly_chart(fig_layout, use_container_width=True)
+    
+    # Tabel detaliat layout
+    layout_detail_df = pd.DataFrame({
+        'Zonă': [v['description'] for v in layout_recommended['distribution'].values()],
+        'Procentaj': [f"{v['percentage']}%" for v in layout_recommended['distribution'].values()],
+        'Suprafață (mp)': [v['m2'] for v in layout_recommended['distribution'].values()]
+    })
+    st.dataframe(layout_detail_df, use_container_width=True, hide_index=True)
+    
+    st.success("""
+    ➡️ **Rezultat:** Flux aerisit + senzație de spațiu > realitatea fizică
+    """)
+    
+    # Secțiune 8: Simulare RedGym Nouă Locație
+    st.markdown("### 🔮 Simulare: Ce se întâmplă dacă RedGym deschide o nouă locație?")
+    
+    simulation = simulate_new_redgym_impact()
+    
+    st.markdown(f"**Scenariu:** {simulation['scenario']}")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### ❌ Ce NU se întâmplă")
+        for item in simulation['what_doesnt_happen']:
+            st.write(f"• {item}")
+    
+    with col2:
+        st.markdown("#### ✅ Ce SE întâmplă în realitate")
+        
+        st.markdown(f"**{simulation['what_happens']['effect_1_fragmentation']['title']}**")
+        st.write(simulation['what_happens']['effect_1_fragmentation']['description'])
+        for detail in simulation['what_happens']['effect_1_fragmentation']['details']:
+            st.write(f"  - {detail}")
+        
+        st.markdown(f"**{simulation['what_happens']['effect_2_education']['title']}**")
+        st.write(simulation['what_happens']['effect_2_education']['description'])
+        for detail in simulation['what_happens']['effect_2_education']['details']:
+            st.write(f"  - {detail}")
+    
+    # Tabel impact
+    impact_df = pd.DataFrame({
+        'Indicator': ['Cerere totală fitness zonă', 'Presiune pe volum', 'Avantajul tău'],
+        'Fără nou RedGym': [
+            simulation['impact_estimates']['without_new_redgym']['total_demand'],
+            simulation['impact_estimates']['without_new_redgym']['volume_pressure'],
+            simulation['impact_estimates']['without_new_redgym']['our_advantage']
+        ],
+        'Cu nou RedGym': [
+            simulation['impact_estimates']['with_new_redgym']['total_demand'],
+            simulation['impact_estimates']['with_new_redgym']['volume_pressure'],
+            simulation['impact_estimates']['with_new_redgym']['our_advantage']
+        ]
+    })
+    st.dataframe(impact_df, use_container_width=True, hide_index=True)
+    
+    st.warning(f"🔑 **Paradox:** {simulation['paradox']}")
+    
+    # Secțiune 9: Profitabilitate (Profit/abonat vs Profit/mp)
+    st.markdown("### 💰 Profitabilitate: Profit/Abonat vs Profit/mp")
+    
+    st.markdown("""
+    Aici se face diferența între **"sală plină"** și **"sală sănătoasă"**.
+    """)
+    
+    profitability = calculate_profitability_comparison(
+        analysis['revenue']['total'],
+        analysis['total_clients'],
+        our_area_m2
+    )
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 🏢 Sală Mare (RedGym / CityGym)")
+        st.write(f"**Abonați:** {profitability['big_gym']['members']}")
+        st.write(f"**Preț mediu:** {profitability['big_gym']['avg_price']} RON")
+        st.write(f"**Venit lunar:** {profitability['big_gym']['monthly_revenue']:,.0f} RON")
+        st.write(f"**Suprafață:** {profitability['big_gym']['area_m2']} mp")
+        st.write(f"**Venit/mp:** {profitability['big_gym']['revenue_per_m2']:.2f} RON/mp")
+    
+    with col2:
+        st.markdown("#### 🏋️ Sala Noastră (Model Controlat)")
+        st.write(f"**Abonați:** {profitability['our_gym']['members']}")
+        st.write(f"**Preț mediu:** {profitability['our_gym']['avg_price']} RON")
+        st.write(f"**Venit lunar:** {profitability['our_gym']['monthly_revenue']:,.0f} RON")
+        st.write(f"**Suprafață:** {profitability['our_gym']['area_m2']} mp")
+        st.write(f"**Venit/mp:** {profitability['our_gym']['revenue_per_m2']:.2f} RON/mp")
+    
+    # Comparație profitabilitate
+    st.markdown("#### 📊 Comparație Profitabilitate Reală")
+    
+    comparison_data = []
+    for key, value in profitability['comparison'].items():
+        comparison_data.append({
+            'Indicator': key.replace('_', ' ').title(),
+            'Sală Mare': value['big_gym'],
+            'Sala Noastră': value['our_gym'],
+            'Notă': value['note']
+        })
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+    
+    # Concluzie investitor
+    st.markdown("#### 🔑 Concluzia de Investitor")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**NU câștigi prin:**")
+        for item in profitability['conclusion']['dont_win_by']:
+            st.write(f"• {item}")
+    
+    with col2:
+        st.markdown("**CÂȘTIGI prin:**")
+        for item in profitability['conclusion']['win_by']:
+            st.write(f"• {item}")
+    
+    # Secțiune 10: Verdict Final
     st.markdown("### ✅ Verdict Final")
     
     verdict_items = [
