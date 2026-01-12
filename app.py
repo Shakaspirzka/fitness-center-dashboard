@@ -1123,38 +1123,20 @@ with tab7:
     <style>
     .toc-container {{
         background-image: url('data:image/png;base64,{background_image_b64}');
-        background-size: 80%;
+        background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
-        background-blend-mode: normal;
-        background-color: rgba(240, 242, 246, 0.25);
+        background-color: rgba(255, 255, 255, 0.9);
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 8px;
         margin-bottom: 30px;
-        border-left: 5px solid #1f77b4;
-        position: relative;
-    }}
-    .toc-container::before {{
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(240, 242, 246, 0.25);
-        border-radius: 10px;
-        z-index: 0;
-    }}
-    .toc-container > * {{
-        position: relative;
-        z-index: 1;
+        border: 2px solid #e0e0e0;
     }}
     .toc-container h3 {{
         margin-top: 0;
         color: #1f77b4;
-        text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.9);
-        background: rgba(255, 255, 255, 0.75);
-        padding: 10px;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 10px 15px;
         border-radius: 5px;
         display: inline-block;
         font-weight: bold;
@@ -1162,9 +1144,10 @@ with tab7:
     .toc-container ul {{
         list-style-type: none;
         padding-left: 0;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.85);
         padding: 15px;
         border-radius: 5px;
+        margin-top: 15px;
     }}
     .toc-container li {{
         margin: 8px 0;
@@ -1172,9 +1155,8 @@ with tab7:
     .toc-container a {{
         text-decoration: none;
         color: #1f77b4;
-        font-weight: 600;
-        transition: color 0.3s ease;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        transition: color 0.2s ease;
     }}
     .toc-container a:hover {{
         color: #0d5a8a;
