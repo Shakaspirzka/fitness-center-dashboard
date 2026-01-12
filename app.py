@@ -411,26 +411,6 @@ with tab3:
         # Tabel detaliat cu sesiuni PT
         if 'pt_session' in active_client_types:
             st.info(f"💡 **PT/Reabilitare:** {clients_data.get('pt_session', 0)} clienți × ~5 sesiuni/lună = {clients_data.get('pt_session_sessions', 0)} sesiuni/lună")
-            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in active_client_types],
-            'Număr Clienți/Sesiuni': [clients_data.get(k, 0) for k in active_client_types]
-        })
-        
-        fig_clients_detailed = px.bar(
-            clients_df,
-            x='Tip Abonament',
-            y='Număr Clienți/Sesiuni',
-            text='Număr Clienți/Sesiuni',
-            color='Tip Abonament',
-            color_discrete_map={
-                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
-                SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
-                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
-            }
-        )
-        fig_clients_detailed.update_traces(textposition='outside')
-        fig_clients_detailed.update_layout(showlegend=False, height=400)
-        st.plotly_chart(fig_clients_detailed, use_container_width=True)
     
     with col2:
         st.markdown("### Parametri Demografici")
