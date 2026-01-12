@@ -1121,7 +1121,7 @@ with tab7:
     <style>
     .toc-container {{
         background-image: url('data:image/png;base64,{background_image_b64}');
-        background-size: cover;
+        background-size: 120%;
         background-position: center;
         background-repeat: no-repeat;
         background-blend-mode: normal;
