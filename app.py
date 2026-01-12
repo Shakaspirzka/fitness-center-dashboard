@@ -221,6 +221,19 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 with tab1:
     st.subheader("Rezumat Analiză")
     
+    # Secțiune introductivă despre modelul de gândire - vizibilă imediat
+    st.info("""
+    **💡 Cum funcționează acest dashboard?**
+    
+    Acest dashboard folosește o abordare **"De Sus în Jos" (Top-Down)**: pornim de la obiectivul final (venit dorit: 50,000 RON/lună) 
+    și calculăm înapoi ce este necesar:
+    
+    **Venit Dorit** → **Clienți Necesari** → **Ocupare Spațiu** → **Populație Necesară** → **Rază de Influență**
+    
+    Toate calculele se actualizează automat când ajustezi parametrii din sidebar. 
+    Pentru detalii complete despre logica de calcul, vezi secțiunea expandabilă de mai jos sau tab-ul "📘 Model de Gândire".
+    """)
+    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -279,11 +292,16 @@ with tab1:
         Este necesară o rază de influență de **{analysis['influence_radius_km']:.2f} km**
         """)
     
-    # Secțiune despre modelul de gândire
+    # Secțiune detaliată despre modelul de gândire
     st.markdown("---")
-    st.markdown("## 🧠 Modelul de Gândire - Cum Funcționează Aplicația")
+    st.markdown("## 🧠 Modelul de Gândire - Detalii Complete")
     
-    with st.expander("📖 **Click pentru a înțelege logica din spatele calculelor**", expanded=False):
+    st.markdown("""
+    **📚 Această secțiune explică în detaliu logica din spatele tuturor calculelor.**  
+    **Recomandăm să o citești pentru a înțelege complet cum funcționează dashboard-ul.**
+    """)
+    
+    with st.expander("📖 **Click pentru a deschide explicațiile detaliate despre modelul de gândire**", expanded=False):
         st.markdown("""
         ### 🎯 Abordarea "De Sus în Jos" (Top-Down)
         
