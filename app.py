@@ -1168,9 +1168,9 @@ with tab7:
         color: #0d5a8a;
         text-decoration: underline;
     }}
-    html {
+    html {{
         scroll-behavior: smooth;
-    }
+    }}
     </style>
     <div class="toc-container">
     <h3>📑 Cuprins</h3>
@@ -1189,22 +1189,22 @@ with tab7:
     </ul>
     </div>
     <script>
-    document.querySelectorAll('.toc-container a').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    document.querySelectorAll('.toc-container a').forEach(anchor => {{
+        anchor.addEventListener('click', function (e) {{
             e.preventDefault();
             const targetId = this.getAttribute('href').substring(1);
             const targetElement = document.getElementById(targetId);
-            if (targetElement) {
+            if (targetElement) {{
                 const offset = 80; // Offset pentru header-ul Streamlit
                 const elementPosition = targetElement.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - offset;
-                window.scrollTo({
+                window.scrollTo({{
                     top: offsetPosition,
                     behavior: 'smooth'
-                });
-            }
-        });
-    });
+                }});
+            }}
+        }});
+    }});
     </script>
     """, unsafe_allow_html=True)
     
