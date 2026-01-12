@@ -1101,11 +1101,20 @@ with tab7:
     market_pos = calculate_market_position(analysis['total_clients'], CAPACITY_PER_HOUR)
     
     # Încarcă imaginea de fundal pentru cuprins
-    background_image_path = r"C:\Users\D\Desktop\harta sali.png"
+    # Încearcă mai întâi calea relativă (pentru Streamlit Cloud), apoi calea absolută (pentru local)
+    background_image_path = None
+    if os.path.exists("harta_sali.png"):
+        background_image_path = "harta_sali.png"
+    elif os.path.exists(r"C:\Users\D\Desktop\harta sali.png"):
+        background_image_path = r"C:\Users\D\Desktop\harta sali.png"
+    
     background_image_b64 = ""
-    if os.path.exists(background_image_path):
-        with open(background_image_path, "rb") as img_file:
-            background_image_b64 = base64.b64encode(img_file.read()).decode('utf-8')
+    if background_image_path:
+        try:
+            with open(background_image_path, "rb") as img_file:
+                background_image_b64 = base64.b64encode(img_file.read()).decode('utf-8')
+        except Exception as e:
+            st.warning(f"Nu s-a putut încărca imaginea: {e}")
     
     # Cuprins interactiv cu scroll smooth și imagine de fundal
     st.markdown(f"""
