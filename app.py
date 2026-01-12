@@ -360,7 +360,63 @@ with tab3:
         active_client_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
                               if k in clients_data and clients_data.get(k, 0) > 0]
         
-        clients_df = pd.DataFrame({
+        # Pentru PT, afișăm și numărul de sesiuni
+        display_data = []
+        for k in active_client_types:
+            name = SUBSCRIPTION_TYPES[k]['name']
+            clients_count = clients_data.get(k, 0)
+            
+            if k == 'pt_session':
+                # Pentru PT, afișăm clienți și sesiuni
+                sessions_count = clients_data.get('pt_session_sessions', clients_count * 5)
+                display_data.append({
+                    'Tip Abonament': name,
+                    'Număr Clienți': clients_count,
+                    'Sesiuni/lună': sessions_count,
+                    'Label': f"{clients_count} clienți ({sessions_count} sesiuni/lună)"
+                })
+            else:
+                display_data.append({
+                    'Tip Abonament': name,
+                    'Număr Clienți': clients_count,
+                    'Sesiuni/lună': None,
+                    'Label': f"{clients_count} clienți"
+                })
+        
+        clients_df = pd.DataFrame(display_data)
+        
+        # Grafic cu label-uri personalizate
+        fig_clients_detailed = px.bar(
+            clients_df,
+            x='Tip Abonament',
+            y='Număr Clienți',
+            text='Label',
+            color='Tip Abonament',
+            color_discrete_map={
+                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
+                SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
+                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
+                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
+            }
+        )
+        fig_clients_detailed.update_traces(textposition='outside')
+        fig_clients_detailed.update_layout(
+            title="Necesar Clienți pe Tip Serviciu",
+            yaxis_title="Număr Clienți",
+            showlegend=False,
+            height=400
+        )
+        st.plotly_chart(fig_clients_detailed, use_container_width=True)
+        
+        # Tabel detaliat cu sesiuni PT
+        if 'pt_session' in active_client_types:
+            st.info(f"💡 **PT/Reabilitare:** {clients_data.get('pt_session', 0)} clienți × ~5 sesiuni/lună = {clients_data.get('pt_session_sessions', 0)} sesiuni/lună")
+        
+        # Eliminăm codul duplicat de mai jos
+        return
+        
+        # Cod vechi (va fi eliminat)
+        clients_df_old = pd.DataFrame({
             'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in active_client_types],
             'Număr Clienți/Sesiuni': [clients_data.get(k, 0) for k in active_client_types]
         })

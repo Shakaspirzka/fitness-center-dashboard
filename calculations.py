@@ -178,7 +178,15 @@ def calculate_clients_needed(
             if sub_info.get('is_session_based', False):
                 # PT/Reabilitare: fiecare slot = 1 sesiune
                 # Numărul de sesiuni = numărul de slot-uri ocupate
-                clients[sub_type] = max(0, int(np.round(sub_slots)))
+                num_sessions = max(0, int(np.round(sub_slots)))
+                # Pentru a calcula clienți: presupunem că fiecare client face în medie 4-6 sesiuni/lună
+                # Folosim 5 sesiuni/lună per client ca medie pentru reabilitare
+                avg_sessions_per_client = 5
+                num_clients = max(0, int(np.ceil(num_sessions / avg_sessions_per_client)))
+                # Returnăm numărul de clienți, nu sesiuni (pentru consistență cu celelalte servicii)
+                clients[sub_type] = num_clients
+                # Stocăm și numărul de sesiuni pentru calculele de venit
+                clients[f'{sub_type}_sessions'] = num_sessions
             elif sub_info.get('sessions') is None:
                 # Abonamente nelimitate (standard, basic, premium)
                 # Presupunem 3 vizite pe săptămână per client
@@ -213,11 +221,17 @@ def calculate_monthly_revenue(
     
     # Calculează venituri pentru fiecare tip de abonament
     for sub_type, num_clients in clients.items():
+        # Ignoră cheile care sunt doar pentru sesiuni (ex: 'pt_session_sessions')
+        if sub_type.endswith('_sessions'):
+            continue
+            
         if sub_type in SUBSCRIPTION_TYPES and num_clients > 0:
             sub_info = SUBSCRIPTION_TYPES[sub_type]
             if sub_info.get('is_session_based', False):
                 # PT/Reabilitare: se plătește per sesiune
-                revenues[sub_type] = num_clients * sub_info['price']
+                # Folosim numărul de sesiuni, nu clienți
+                num_sessions = clients.get(f'{sub_type}_sessions', num_clients * 5)  # Fallback: 5 sesiuni per client
+                revenues[sub_type] = num_sessions * sub_info['price']
             else:
                 # Abonamente lunare
                 revenues[sub_type] = num_clients * sub_info['price']
