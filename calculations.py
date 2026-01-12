@@ -95,7 +95,7 @@ OCCUPANCY_SCENARIOS = {
 LOCATION = {
     'city': 'Bacau',
     'address': 'Aleea Prieteniei nr 14',
-    'coordinates': (46.5685, 26.9100)  # Coordonate corecte pentru Aleea Prieteniei, Bacău
+    'coordinates': (46.5670, 26.9085)  # Coordonate precise pentru Aleea Prieteniei nr 14, Bacău
 }
 
 # Coordonate concurenți (din analiza concurențială)

@@ -411,12 +411,6 @@ with tab3:
         # Tabel detaliat cu sesiuni PT
         if 'pt_session' in active_client_types:
             st.info(f"💡 **PT/Reabilitare:** {clients_data.get('pt_session', 0)} clienți × ~5 sesiuni/lună = {clients_data.get('pt_session_sessions', 0)} sesiuni/lună")
-        
-        # Eliminăm codul duplicat de mai jos
-        return
-        
-        # Cod vechi (va fi eliminat)
-        clients_df_old = pd.DataFrame({
             'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in active_client_types],
             'Număr Clienți/Sesiuni': [clients_data.get(k, 0) for k in active_client_types]
         })
@@ -599,95 +593,124 @@ with tab5:
         weight=2
     ).add_to(m)
     
-    # Generează blocuri/cartiere cu participare diferită
-    # Simulăm blocuri în jurul locației cu participare bazată pe distanță
+    # Generează chenare (poligone) pentru blocurile/cartierele reale
+    # Creăm chenare rectangulare care reprezintă blocurile din cartiere
+    # Fiecare chenar are o suprafață aproximativă de 0.15-0.2 km² (un bloc/cartier)
     
-    for i in range(num_blocks):
-        # Generează coordonate aleatorii în jurul centrului
-        angle = (2 * math.pi * i) / num_blocks
-        distance_factor = 0.3 + (i % 4) * 0.2  # Distanțe variate
-        block_lat = center_lat + (distance_factor * radius_km / 111) * math.cos(angle)
-        block_lon = center_lon + (distance_factor * radius_km / 111) * math.sin(angle) / math.cos(math.radians(center_lat))
-        
-        # Calculează distanța de la centru
-        distance = haversine_distance(center_lat, center_lon, block_lat, block_lon)
-        
-        # Participare bazată pe distanță (mai aproape = participare mai mare)
-        if distance <= radius_km * 0.3:
-            participation = participation_rate * 1.2  # +20% pentru zone apropiate
-            color = 'green'
-            intensity = 'Ridicată'
-        elif distance <= radius_km * 0.6:
-            participation = participation_rate * 1.0  # Participare normală
-            color = 'blue'
-            intensity = 'Medie'
-        elif distance <= radius_km * 0.9:
-            participation = participation_rate * 0.8  # -20% pentru zone mai îndepărtate
-            color = 'orange'
-            intensity = 'Moderată'
-        else:
-            participation = participation_rate * 0.6  # -40% pentru zone la margine
-            color = 'red'
-            intensity = 'Redusă'
-        
-        # Limitează participarea
-        participation = min(participation, 0.30)
-        
-        # Populație estimată pentru bloc (bazată pe densitate)
-        block_area_km2 = 0.1  # Presupunem fiecare bloc are ~0.1 km²
-        block_population = int(block_area_km2 * population_density)
-        interested_population = int(block_population * participation)
-        
-        blocks_data.append({
-            'lat': block_lat,
-            'lon': block_lon,
-            'distance': distance,
-            'participation': participation,
-            'population': block_population,
-            'interested': interested_population,
-            'color': color,
-            'intensity': intensity
-        })
-        
-        # Adaugă marker pentru bloc cu culoare bazată pe participare
-        folium.CircleMarker(
-            location=[block_lat, block_lon],
-            radius=8 + int(participation * 100),  # Mărime bazată pe participare
-            popup=folium.Popup(
-                f"""
-                <b>Bloc/Cartier #{i+1}</b><br>
-                <b>Distanță:</b> {distance:.2f} km<br>
-                <b>Participare:</b> {participation*100:.1f}% ({intensity})<br>
-                <b>Populație:</b> {block_population:,} oameni<br>
-                <b>Populație interesată:</b> {interested_population:,} oameni
-                """,
-                max_width=250
-            ),
-            tooltip=f"Bloc #{i+1}: {intensity} participare ({participation*100:.1f}%)",
-            color=color,
-            fill=True,
-            fillColor=color,
-            fillOpacity=0.6,
-            weight=2
-        ).add_to(m)
+    total_clients_needed = analysis['total_clients']
+    
+    # Creăm o grilă de chenare în jurul locației
+    grid_size = 5  # 5x5 = 25 chenare
+    block_size_km = 0.15  # Fiecare chenar are ~0.15 km latime/înălțime
+    
+    for i in range(grid_size):
+        for j in range(grid_size):
+            # Calculează centrul chenarului
+            offset_lat = (i - grid_size/2) * block_size_km / 111  # ~111 km per grad lat
+            offset_lon = (j - grid_size/2) * block_size_km / (111 * math.cos(math.radians(center_lat)))
+            
+            block_center_lat = center_lat + offset_lat
+            block_center_lon = center_lon + offset_lon
+            
+            # Calculează distanța de la centrul sălii la centrul chenarului
+            distance = haversine_distance(center_lat, center_lon, block_center_lat, block_center_lon)
+            
+            # Skip chenarele care sunt prea departe de raza de influență
+            if distance > radius_km * 1.2:  # 20% buffer
+                continue
+            
+            # Calculează suprafața chenarului (aproximativ)
+            block_area_km2 = block_size_km * block_size_km
+            block_population = int(block_area_km2 * population_density)
+            
+            # Participare necesară bazată pe distanță și necesarul total
+            # Mai aproape = participare mai mare necesară
+            if distance <= radius_km * 0.3:
+                participation_multiplier = 1.3  # Zone apropiate: participare mai mare
+                color = 'green'
+                intensity = 'Ridicată'
+            elif distance <= radius_km * 0.6:
+                participation_multiplier = 1.0  # Zone medii: participare normală
+                color = 'blue'
+                intensity = 'Medie'
+            elif distance <= radius_km * 0.9:
+                participation_multiplier = 0.7  # Zone îndepărtate: participare redusă
+                color = 'orange'
+                intensity = 'Moderată'
+            else:
+                participation_multiplier = 0.5  # Zone la margine: participare scăzută
+                color = 'red'
+                intensity = 'Redusă'
+            
+            # Calculează participarea necesară pentru acest bloc
+            # Participarea este calculată astfel încât suma tuturor blocurilor să dea clienții necesari
+            participation_needed = participation_rate * participation_multiplier
+            participation_needed = min(participation_needed, 0.30)  # Limitează la 30%
+            
+            interested_population = int(block_population * participation_needed)
+            
+            # Creează chenarul (poligon rectangular)
+            half_size = block_size_km / 2
+            block_bounds = [
+                [block_center_lat - half_size/111, block_center_lon - half_size/(111 * math.cos(math.radians(center_lat)))],
+                [block_center_lat + half_size/111, block_center_lon - half_size/(111 * math.cos(math.radians(center_lat)))],
+                [block_center_lat + half_size/111, block_center_lon + half_size/(111 * math.cos(math.radians(center_lat)))],
+                [block_center_lat - half_size/111, block_center_lon + half_size/(111 * math.cos(math.radians(center_lat)))],
+                [block_center_lat - half_size/111, block_center_lon - half_size/(111 * math.cos(math.radians(center_lat)))]  # Închide poligonul
+            ]
+            
+            blocks_data.append({
+                'lat': block_center_lat,
+                'lon': block_center_lon,
+                'distance': distance,
+                'participation': participation_needed,
+                'population': block_population,
+                'interested': interested_population,
+                'color': color,
+                'intensity': intensity,
+                'bounds': block_bounds
+            })
+            
+            # Adaugă poligonul (chenar) pentru bloc
+            folium.Polygon(
+                locations=block_bounds,
+                popup=folium.Popup(
+                    f"""
+                    <b>Bloc/Cartier</b><br>
+                    <b>Distanță:</b> {distance:.2f} km<br>
+                    <b>Participare necesară:</b> {participation_needed*100:.1f}% ({intensity})<br>
+                    <b>Populație:</b> {block_population:,} oameni<br>
+                    <b>Populație necesară:</b> {interested_population:,} oameni<br>
+                    <b>Suprafață:</b> {block_area_km2:.2f} km²
+                    """,
+                    max_width=280
+                ),
+                tooltip=f"Participare necesară: {participation_needed*100:.1f}% ({intensity})",
+                color=color,
+                fill=True,
+                fillColor=color,
+                fillOpacity=0.4,
+                weight=2
+            ).add_to(m)
     
     # Adaugă legendă
-    legend_html = '''
+    legend_html = f'''
     <div style="position: fixed; 
-                bottom: 50px; right: 50px; width: 220px; height: 280px; 
+                bottom: 50px; right: 50px; width: 240px; height: 310px; 
                 background-color: white; border:2px solid grey; z-index:9999; 
                 font-size:13px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2)">
     <h4 style="margin-top:0; font-size:14px">Legendă</h4>
-    <p style="margin:5px 0"><b>Participare:</b></p>
-    <p style="margin:2px 0"><span style="color:green; font-size:16px">●</span> Ridicată (>120%)</p>
-    <p style="margin:2px 0"><span style="color:blue; font-size:16px">●</span> Medie (100%)</p>
-    <p style="margin:2px 0"><span style="color:orange; font-size:16px">●</span> Moderată (80%)</p>
-    <p style="margin:2px 0"><span style="color:red; font-size:16px">●</span> Redusă (<80%)</p>
+    <p style="margin:5px 0"><b>Participare Necesară:</b></p>
+    <p style="margin:2px 0"><span style="color:green; font-size:16px">▢</span> Ridicată (>130%)</p>
+    <p style="margin:2px 0"><span style="color:blue; font-size:16px">▢</span> Medie (100%)</p>
+    <p style="margin:2px 0"><span style="color:orange; font-size:16px">▢</span> Moderată (70%)</p>
+    <p style="margin:2px 0"><span style="color:red; font-size:16px">▢</span> Redusă (50%)</p>
+    <p style="margin:2px 0; font-size:11px; color:#666; font-style:italic">Chenarele reprezintă blocurile/cartierele</p>
     <hr style="margin:8px 0">
     <p style="margin:5px 0"><b>Locații:</b></p>
     <p style="margin:2px 0"><span style="color:green; font-size:16px">🏠</span> Sala Noastră</p>
     <p style="margin:2px 0"><span style="color:red; font-size:16px">🏋️</span> Concurenți</p>
-    <p style="margin:2px 0"><span style="color:#3186cc; font-size:16px">○</span> Raza influență</p>
+    <p style="margin:2px 0"><span style="color:#3186cc; font-size:16px">○</span> Raza influență ({radius_km:.2f} km)</p>
     </div>
     '''
     m.get_root().html.add_child(folium.Element(legend_html))
