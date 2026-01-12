@@ -9,6 +9,8 @@ import folium
 from folium import plugins
 from streamlit_folium import st_folium
 import math
+import base64
+import os
 from calculations import (
     get_scenario_analysis,
     compare_scenarios,
@@ -1098,37 +1100,74 @@ with tab7:
     competitors = get_competitors_comparison()
     market_pos = calculate_market_position(analysis['total_clients'], CAPACITY_PER_HOUR)
     
-    # Cuprins interactiv cu scroll smooth
-    st.markdown("""
+    # Încarcă imaginea de fundal pentru cuprins
+    background_image_path = r"C:\Users\D\Desktop\harta sali.png"
+    background_image_b64 = ""
+    if os.path.exists(background_image_path):
+        with open(background_image_path, "rb") as img_file:
+            background_image_b64 = base64.b64encode(img_file.read()).decode('utf-8')
+    
+    # Cuprins interactiv cu scroll smooth și imagine de fundal
+    st.markdown(f"""
     <style>
-    .toc-container {
-        background-color: #f0f2f6;
+    .toc-container {{
+        background-image: url('data:image/png;base64,{background_image_b64}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-blend-mode: overlay;
+        background-color: rgba(240, 242, 246, 0.85);
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 30px;
         border-left: 5px solid #1f77b4;
-    }
-    .toc-container h3 {
+        position: relative;
+    }}
+    .toc-container::before {{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(240, 242, 246, 0.7);
+        border-radius: 10px;
+        z-index: 0;
+    }}
+    .toc-container > * {{
+        position: relative;
+        z-index: 1;
+    }}
+    .toc-container h3 {{
         margin-top: 0;
         color: #1f77b4;
-    }
-    .toc-container ul {
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.6);
+        padding: 10px;
+        border-radius: 5px;
+        display: inline-block;
+    }}
+    .toc-container ul {{
         list-style-type: none;
         padding-left: 0;
-    }
-    .toc-container li {
+        background: rgba(255, 255, 255, 0.6);
+        padding: 15px;
+        border-radius: 5px;
+    }}
+    .toc-container li {{
         margin: 8px 0;
-    }
-    .toc-container a {
+    }}
+    .toc-container a {{
         text-decoration: none;
         color: #1f77b4;
         font-weight: 500;
         transition: color 0.3s ease;
-    }
-    .toc-container a:hover {
+        text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.8);
+    }}
+    .toc-container a:hover {{
         color: #0d5a8a;
         text-decoration: underline;
-    }
+    }}
     html {
         scroll-behavior: smooth;
     }
