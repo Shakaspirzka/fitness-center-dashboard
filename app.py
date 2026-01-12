@@ -501,6 +501,19 @@ with tab1:
         - 10% este o estimare conservatoare
         - Dacă ai date reale, folosește-le
         - Impact direct asupra razei de influență
+        - Reprezintă procentul din populația totală care ar putea fi interesați de fitness
+        
+        **5. Rata de Acoperire Definește Dimensiunea Campaniei**
+        - Controlată de tine (10-100%, default 50%)
+        - Definește ce procent din populația interesată trebuie atins
+        - Impact direct asupra costurilor campaniei
+        - Mai mare = campanie mai amplă, dar mai scumpă
+        
+        **6. Rata de Conversie Determină Eficiența**
+        - Reflectă calitatea campaniei și a ofertei
+        - 5% este un standard realist pentru campanii bine targetate
+        - Poate fi îmbunătățită prin mesaje clare și oferte atractive
+        - Impact direct asupra numărului de oameni care trebuie atinși
         
         ---
         
@@ -2101,6 +2114,7 @@ with tab8:
         ("abordare-top-down", "📊 Abordarea Top-Down"),
         ("principii-baza", "📐 Principiile de Bază"),
         ("logica-calcul", "🔢 Logica de Calcul"),
+        ("explicatie-rate", "📊 Explicația Detaliată a Ratelor"),
         ("model-geografic", "🗺️ Modelul Geografic"),
         ("structura-dashboard", "📊 Structura Dashboard-ului"),
         ("design-decisions", "🎨 Design Decisions"),
@@ -2326,16 +2340,179 @@ with tab8:
     st.markdown("""
     ### 4. Calculul Dimensiunii Campaniei
     
+    Logica completă pentru calcularea dimensiunii campaniei necesare:
+    
     ```
-    Populație totală în zonă = π × rază² × densitate
-    Populație interesată = Populație totală × rata participare
-    Populație țintă = Clienți necesari / rata conversie
+    Pasul 1: Câți oameni trebuie atinși?
+    Populație de atins = Clienți necesari / Rata de Conversie
+    
+    Pasul 2: Câtă populație interesată avem nevoie?
+    Populație interesată necesară = Populație de atins / Rata de Acoperire
+    
+    Pasul 3: Câtă populație totală avem nevoie?
+    Populație totală necesară = Populație interesată necesară / Rata de Participare
+    
+    Pasul 4: Ce suprafață trebuie să acoperim?
+    Suprafață necesară = Populație totală necesară / Densitate populație
+    
+    Pasul 5: Care este raza necesară?
+    Raza = √(Suprafață necesară / π)
     ```
     
-    **Rata conversie:**
-    - Presupunem 5% (din cei interesați devin clienți)
-    - Poate fi ajustată în funcție de experiență
-    - Reflectă realitatea campaniilor de marketing
+    **Exemplu concret:**
+    - Clienți necesari: 300
+    - Rata de Conversie: 5% → Populație de atins: 300 / 0.05 = 6,000 oameni
+    - Rata de Acoperire: 50% → Populație interesată necesară: 6,000 / 0.50 = 12,000 oameni
+    - Rata de Participare: 10% → Populație totală necesară: 12,000 / 0.10 = 120,000 oameni
+    - Densitate: 1,000 oameni/km² → Suprafață: 120,000 / 1,000 = 120 km²
+    - Raza: √(120 / 3.14) ≈ 6.18 km
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown('<div id="explicatie-rate"></div>', unsafe_allow_html=True)
+    st.markdown("""
+    ### 5. Explicația Detaliată a Ratelor
+    
+    #### 📊 Rata de Participare a Populației
+    
+    **Ce înseamnă?**
+    Rata de participare reprezintă procentul din populația totală dintr-o zonă care ar putea fi potențial interesați de serviciile fitness și recuperare.
+    
+    **Cum se calculează?**
+    ```
+    Populație Interesată = Populație Totală × Rata de Participare
+    ```
+    
+    **Exemplu:**
+    - Populație totală în zonă: 100,000 oameni
+    - Rata de participare: 10%
+    - Populație interesată: 100,000 × 10% = 10,000 oameni
+    
+    **Ce valori sunt realiste?**
+    - **5-8%**: Conservator, pentru zone cu interes redus pentru fitness
+    - **10-12%**: Realist pentru majoritatea zonelor urbane
+    - **15-20%**: Optimist, pentru zone cu interes ridicat pentru fitness
+    - **Peste 20%**: Foarte optimist, rar întâlnit
+    
+    **De ce este importantă?**
+    - Determină câtă populație totală trebuie să acoperi pentru a avea suficienți oameni interesați
+    - Impact direct asupra razei de influență necesare
+    - Poate fi ajustată pe baza datelor reale din sondaje sau cercetări de piață
+    
+    **Cum să o estimezi?**
+    - Sondaje în zonă
+    - Date despre utilizarea sălilor existente
+    - Analiză demografică (vârstă, venit, stil de viață)
+    - Comparație cu zone similare
+    
+    ---
+    
+    #### 🎯 Rata de Acoperire
+    
+    **Ce înseamnă?**
+    Rata de acoperire definește ce procent din populația interesată trebuie atins efectiv de campania de marketing pentru a obține clienții necesari.
+    
+    **Cum se calculează?**
+    ```
+    Populație de Atins = Populație Interesată × Rata de Acoperire
+    ```
+    
+    **Exemplu:**
+    - Populație interesată: 10,000 oameni
+    - Rata de acoperire: 50%
+    - Populație de atins: 10,000 × 50% = 5,000 oameni
+    
+    **Ce valori sunt realiste?**
+    - **30-40%**: Campanie conservatoare, pentru zone cu concurență redusă
+    - **50-60%**: Realist pentru majoritatea campaniilor
+    - **70-80%**: Campanie agresivă, pentru zone competitive
+    - **90-100%**: Foarte agresiv, necesită buget mare
+    
+    **De ce este importantă?**
+    - Definește dimensiunea reală a campaniei de marketing
+    - Impact direct asupra costurilor campaniei
+    - Permite controlul asupra intensității campaniei
+    
+    **Factori care influențează rata de acoperire:**
+    - **Concurența**: Zone cu mai multe săli necesită acoperire mai mare
+    - **Buget disponibil**: Buget mai mare permite acoperire mai mare
+    - **Strategia**: Campanie agresivă vs. graduală
+    - **Calitatea mesajului**: Mesaj mai bun = acoperire mai mică necesară
+    
+    ---
+    
+    #### 💰 Rata de Conversie a Campaniei
+    
+    **Ce înseamnă?**
+    Rata de conversie reprezintă procentul din oamenii atinși de campanie care devin efectiv clienți (se înscriu și plătesc abonamentul).
+    
+    **Cum se calculează?**
+    ```
+    Clienți Obținuți = Populație de Atins × Rata de Conversie
+    ```
+    
+    **Exemplu:**
+    - Populație de atins: 5,000 oameni
+    - Rata de conversie: 5%
+    - Clienți obținuți: 5,000 × 5% = 250 clienți
+    
+    **Ce valori sunt realiste?**
+    - **2-3%**: Conservator, pentru campanii generale
+    - **5-7%**: Realist pentru campanii bine targetate
+    - **8-10%**: Bun, pentru campanii foarte bine targetate și mesaje puternice
+    - **Peste 10%**: Excelent, rar întâlnit, necesită mesaj foarte puternic și ofertă atractivă
+    
+    **De ce este importantă?**
+    - Determină câți oameni trebuie atinși pentru a obține numărul de clienți necesari
+    - Impact direct asupra costurilor campaniei (mai mulți oameni de atins = costuri mai mari)
+    - Reflectă eficiența campaniei de marketing
+    
+    **Factori care influențează rata de conversie:**
+    - **Calitatea mesajului**: Mesaj clar și atractiv = conversie mai bună
+    - **Targeting**: Campanii bine targetate = conversie mai bună
+    - **Oferta**: Ofertă atractivă (preț, servicii) = conversie mai bună
+    - **Momentul**: Campanii în perioade relevante = conversie mai bună
+    - **Canalul de marketing**: Canale eficiente = conversie mai bună
+    
+    **Cum să îmbunătățești rata de conversie:**
+    - Mesaj clar despre propunerea de valoare
+    - Ofertă atractivă (prețuri competitive, servicii relevante)
+    - Call-to-action clar
+    - Ușurință în procesul de înscriere
+    - Testare și optimizare continuă
+    
+    ---
+    
+    #### 🔄 Relația între Cele Trei Rate
+    
+    Aceste trei rate lucrează împreună pentru a determina dimensiunea campaniei:
+    
+    ```
+    Populație Totală
+        ↓ (× Rata de Participare)
+    Populație Interesată
+        ↓ (× Rata de Acoperire)
+    Populație de Atins
+        ↓ (× Rata de Conversie)
+    Clienți Finali
+    ```
+    
+    **Exemplu complet:**
+    - Populație totală: 100,000 oameni
+    - Rata de participare: 10% → Populație interesată: 10,000 oameni
+    - Rata de acoperire: 50% → Populație de atins: 5,000 oameni
+    - Rata de conversie: 5% → Clienți finali: 250 clienți
+    
+    **Impactul ajustărilor:**
+    - **Creșterea ratei de participare** → Mai puțină populație totală necesară
+    - **Creșterea ratei de acoperire** → Mai puțină populație interesată necesară
+    - **Creșterea ratei de conversie** → Mai puțină populație de atins necesară
+    
+    **Optimizare:**
+    - Poți ajusta oricare dintre rate pentru a optimiza dimensiunea campaniei
+    - De obicei, este mai eficient să îmbunătățești rata de conversie decât să crești acoperirea
+    - Rata de participare este cel mai greu de influențat (depinde de demografie)
     """)
     
     st.markdown("---")
@@ -2494,6 +2671,28 @@ with tab8:
     - 10% este o estimare conservatoare
     - Dacă ai date reale, folosește-le
     - Impact direct asupra razei de influență
+    - **Definiție:** Reprezintă procentul din populația totală care ar putea fi interesați de fitness
+    - **Calcul:** Populație Interesată = Populație Totală × Rata de Participare
+    - **Valori realiste:** 5-8% (conservator), 10-12% (realist), 15-20% (optimist)
+    
+    ### 5. Rata de Acoperire Definește Dimensiunea Campaniei
+    
+    - Controlată de tine prin slider (10-100%, default 50%)
+    - Definește ce procent din populația interesată trebuie atins de campanie
+    - Impact direct asupra costurilor campaniei
+    - **Definiție:** Populație de Atins = Populație Interesată × Rata de Acoperire
+    - **Valori realiste:** 30-40% (conservator), 50-60% (realist), 70-80% (agresiv)
+    - Mai mare = campanie mai amplă, dar mai scumpă
+    
+    ### 6. Rata de Conversie Determină Eficiența Campaniei
+    
+    - Reflectă calitatea campaniei și a ofertei
+    - 5% este un standard realist pentru campanii bine targetate
+    - Poate fi îmbunătățită prin mesaje clare și oferte atractive
+    - Impact direct asupra numărului de oameni care trebuie atinși
+    - **Definiție:** Clienți Obținuți = Populație de Atins × Rata de Conversie
+    - **Valori realiste:** 2-3% (conservator), 5-7% (realist), 8-10% (excelent)
+    - **Cum să o îmbunătățești:** Mesaj clar, ofertă atractivă, call-to-action clar, ușurință în înscriere
     """)
     
     st.markdown("---")
