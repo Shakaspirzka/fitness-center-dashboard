@@ -595,19 +595,25 @@ with tab5:
     
     # Generează chenare (poligone) pentru blocurile/cartierele reale
     # Creăm chenare rectangulare care reprezintă blocurile din cartiere
-    # Fiecare chenar are o suprafață aproximativă de 0.15-0.2 km² (un bloc/cartier)
+    # Fiecare chenar are o suprafață aproximativă de 0.1-0.15 km² (un bloc/cartier)
     
     total_clients_needed = analysis['total_clients']
     
-    # Creăm o grilă de chenare în jurul locației
-    grid_size = 5  # 5x5 = 25 chenare
-    block_size_km = 0.15  # Fiecare chenar are ~0.15 km latime/înălțime
+    # Creăm o grilă de chenare în jurul locației, aliniată cu structura reală a orașului
+    # Folosim o grilă mai densă pentru a se alinia mai bine cu blocurile reale
+    grid_size = 7  # 7x7 = 49 chenare (mai multe pentru acoperire mai bună)
+    block_size_km = 0.12  # Fiecare chenar are ~0.12 km latime/înălțime (mai mic pentru precizie)
+    
+    # Calculează participarea medie necesară pentru a atinge obiectivul
+    total_area_covered = math.pi * (radius_km ** 2)  # Suprafața totală acoperită
+    total_population_in_radius = int(total_area_covered * population_density)
+    avg_participation_needed = total_clients_needed / total_population_in_radius if total_population_in_radius > 0 else participation_rate
     
     for i in range(grid_size):
         for j in range(grid_size):
             # Calculează centrul chenarului
-            offset_lat = (i - grid_size/2) * block_size_km / 111  # ~111 km per grad lat
-            offset_lon = (j - grid_size/2) * block_size_km / (111 * math.cos(math.radians(center_lat)))
+            offset_lat = (i - grid_size/2 + 0.5) * block_size_km / 111  # +0.5 pentru centrare
+            offset_lon = (j - grid_size/2 + 0.5) * block_size_km / (111 * math.cos(math.radians(center_lat)))
             
             block_center_lat = center_lat + offset_lat
             block_center_lon = center_lon + offset_lon
@@ -615,8 +621,8 @@ with tab5:
             # Calculează distanța de la centrul sălii la centrul chenarului
             distance = haversine_distance(center_lat, center_lon, block_center_lat, block_center_lon)
             
-            # Skip chenarele care sunt prea departe de raza de influență
-            if distance > radius_km * 1.2:  # 20% buffer
+            # Skip chenarele care sunt prea departe de raza de influență (doar cele din interiorul razei)
+            if distance > radius_km:
                 continue
             
             # Calculează suprafața chenarului (aproximativ)
@@ -644,8 +650,12 @@ with tab5:
             
             # Calculează participarea necesară pentru acest bloc
             # Participarea este calculată astfel încât suma tuturor blocurilor să dea clienții necesari
-            participation_needed = participation_rate * participation_multiplier
-            participation_needed = min(participation_needed, 0.30)  # Limitează la 30%
+            # Folosim participarea medie necesară ca bază și ajustăm cu multiplicatorul de distanță
+            participation_needed = avg_participation_needed * participation_multiplier
+            
+            # Ajustare: zonele mai apropiate trebuie să contribuie mai mult
+            # Normalizăm astfel încât suma tuturor blocurilor să dea clienții necesari
+            participation_needed = max(0.01, min(participation_needed, 0.30))  # Limitează între 1% și 30%
             
             interested_population = int(block_population * participation_needed)
             
