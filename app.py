@@ -215,7 +215,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "🗺️ Hartă Participare",
     "🎯 Campanie",
     "🏆 Analiză Concurențială",
-    "📘 Model de Gândire și Arhitectură Dashboard"
+    "📘 Scopul și Arhitectura Dashboard"
 ])
 
 with tab1:
@@ -231,7 +231,7 @@ with tab1:
     **Venit Dorit** → **Clienți Necesari** → **Ocupare Spațiu** → **Populație Necesară** → **Rază de Influență**
     
     Toate calculele se actualizează automat când ajustezi parametrii din sidebar. 
-    Pentru detalii complete despre logica de calcul, vezi secțiunea expandabilă de mai jos sau tab-ul "📘 Model de Gândire".
+    Pentru detalii complete despre logica de calcul, vezi secțiunea expandabilă de mai jos sau tab-ul "📘 Scopul și Arhitectura Dashboard".
     """)
     
     col1, col2 = st.columns(2)
@@ -444,7 +444,7 @@ with tab1:
         
         ---
         
-        **💡 Pentru mai multe detalii despre modelul de gândire, vezi tab-ul "📘 Model de Gândire"**
+        **💡 Pentru mai multe detalii despre modelul de gândire, vezi tab-ul "📘 Scopul și Arhitectura Dashboard"**
         """)
 
 with tab2:
@@ -1482,10 +1482,10 @@ with tab7:
     Noua sală nu concurează cu acestea pe volum sau preț, ci ocupă un gol clar de piață, definit de control, calitate și proximitate.
     """)
 
-# Tab 8: Model de Gândire
+# Tab 8: Scopul și Arhitectura Dashboard
 with tab8:
     st.markdown("""
-    # 📘 Model de Gândire și Arhitectură Dashboard
+    # 📘 Scopul și Arhitectura Dashboard
     ## Analiză Potențial Spațiu Fitness & Recuperare - Bacau
     
     ---
@@ -1782,7 +1782,7 @@ with tab8:
        - Avantaje competitive
        - Layout și eficiență spațială
     
-    8. **📘 Model de Gândire**: "Cum funcționează totul?" (acest tab)
+    8. **📘 Scopul și Arhitectura Dashboard**: "Cum funcționează totul?" (acest tab)
        - Explicații detaliate
        - Logica din spatele calculelor
        - Înțelegere completă a modelului
