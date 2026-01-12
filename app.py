@@ -41,6 +41,86 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Funcție helper pentru cuprins (fără imagine de fundal)
+def create_table_of_contents(title, items):
+    """
+    Creează un cuprins interactiv cu scroll smooth
+    
+    Args:
+        title: Titlul cuprinsului
+        items: Lista de tuple-uri (id_anchor, text_link)
+    """
+    items_html = "\n".join([f'        <li><a href="#{item_id}">{item_text}</a></li>' for item_id, item_text in items])
+    
+    return f"""
+    <style>
+    .toc-container-simple {{
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 2px solid #e0e0e0;
+    }}
+    .toc-container-simple h3 {{
+        margin-top: 0;
+        color: #1f77b4;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 15px;
+        border-radius: 5px;
+        display: inline-block;
+        font-weight: bold;
+    }}
+    .toc-container-simple ul {{
+        list-style-type: none;
+        padding-left: 0;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }}
+    .toc-container-simple li {{
+        margin: 8px 0;
+    }}
+    .toc-container-simple a {{
+        text-decoration: none;
+        color: #1f77b4;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }}
+    .toc-container-simple a:hover {{
+        color: #0d5a8a;
+        text-decoration: underline;
+    }}
+    html {{
+        scroll-behavior: smooth;
+    }}
+    </style>
+    <div class="toc-container-simple">
+    <h3>{title}</h3>
+    <ul>
+{items_html}
+    </ul>
+    </div>
+    <script>
+    document.querySelectorAll('.toc-container-simple a').forEach(anchor => {{
+        anchor.addEventListener('click', function (e) {{
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {{
+                const offset = 80; // Offset pentru header-ul Streamlit
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({{
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                }});
+            }}
+        }});
+    }});
+    </script>
+    """
+
 # Stiluri custom
 st.markdown("""
     <style>
@@ -221,7 +301,19 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 with tab1:
     st.subheader("Rezumat Analiză")
     
+    # Cuprins pentru tab Rezumat
+    toc_items = [
+        ("intro-model", "💡 Introducere - Modelul de Gândire"),
+        ("capacitate-spatiu", "📊 Capacitate Spațiu"),
+        ("distributie-abonamente", "💳 Distribuție Abonamente"),
+        ("clienti-tip", "👥 Clienți pe Tip Abonament"),
+        ("raza-influenta", "🗺️ Raza de Influență"),
+        ("model-gandire", "📘 Modelul de Gândire - Detalii Complete")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
+    
     # Secțiune introductivă despre modelul de gândire - vizibilă imediat
+    st.markdown('<div id="intro-model"></div>', unsafe_allow_html=True)
     st.info("""
     **💡 Cum funcționează acest dashboard?**
     
@@ -237,11 +329,13 @@ with tab1:
     col1, col2 = st.columns(2)
     
     with col1:
+        st.markdown('<div id="capacitate-spatiu"></div>', unsafe_allow_html=True)
         st.markdown("### Capacitate Spațiu")
         st.write(f"**Capacitate maximă lunară:** {analysis['max_capacity']:,} slot-uri")
         st.write(f"**Slot-uri ocupate:** {analysis['occupied_slots']:,} slot-uri")
         st.write(f"**Rata ocupare:** {analysis['occupancy_rate']*100:.1f}%")
         
+        st.markdown('<div id="distributie-abonamente"></div>', unsafe_allow_html=True)
         st.markdown("### Distribuție Abonamente")
         st.caption("💡 **Notă:** Procentajele sunt normalizate automat la 100% pentru calcule corecte.")
         dist_df = pd.DataFrame({
@@ -259,6 +353,7 @@ with tab1:
             st.warning(f"⚠️ **Suma procentajelor:** {total_check:.1f}%")
     
     with col2:
+        st.markdown('<div id="clienti-tip"></div>', unsafe_allow_html=True)
         st.markdown("### Clienți pe Tip Abonament")
         clients_data = analysis['revenue']['clients']
         # Filtrează doar cheile care există în SUBSCRIPTION_TYPES (exclude chei suplimentare precum 'pt_session_sessions')
@@ -283,6 +378,7 @@ with tab1:
         fig_clients.update_layout(showlegend=False, height=300)
         st.plotly_chart(fig_clients, use_container_width=True)
         
+        st.markdown('<div id="raza-influenta"></div>', unsafe_allow_html=True)
         st.markdown("### Raza de Influență")
         st.info(f"""
         Pentru a atinge **{analysis['total_clients']} clienți** cu:
@@ -294,6 +390,7 @@ with tab1:
     
     # Secțiune detaliată despre modelul de gândire
     st.markdown("---")
+    st.markdown('<div id="model-gandire"></div>', unsafe_allow_html=True)
     st.markdown("## 🧠 Modelul de Gândire - Detalii Complete")
     
     st.markdown("""
@@ -450,9 +547,18 @@ with tab1:
 with tab2:
     st.subheader("Analiză Venituri")
     
+    # Cuprins pentru tab Venituri
+    toc_items = [
+        ("distributie-venituri", "📊 Distribuție Venituri pe Tip Abonament"),
+        ("comparatie-venit", "📈 Comparație cu Venitul Dorit"),
+        ("tabel-detaliu", "📋 Tabel Detaliat Venituri")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     
     with col1:
+        st.markdown('<div id="distributie-venituri"></div>', unsafe_allow_html=True)
         # Grafic venituri pe tip abonament
         revenue_data = analysis['revenue']
         # Obține doar tipurile cu venit > 0
@@ -497,6 +603,7 @@ with tab2:
         st.plotly_chart(fig_target, use_container_width=True)
         
         # Tabel detaliat venituri
+        st.markdown('<div id="tabel-detaliu"></div>', unsafe_allow_html=True)
         revenue_detail_data = []
         for k in active_types:
             if k in revenue_data['clients']:
@@ -523,9 +630,18 @@ with tab2:
 with tab3:
     st.subheader("Analiză Clienți & Demografie")
     
+    # Cuprins pentru tab Clienți & Demografie
+    toc_items = [
+        ("necesar-clienti", "👥 Necesar Clienți"),
+        ("parametri-demografici", "📊 Parametri Demografici"),
+        ("zona-acoperire", "🗺️ Zonă de Acoperire")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     
     with col1:
+        st.markdown('<div id="necesar-clienti"></div>', unsafe_allow_html=True)
         st.markdown("### Necesar Clienți")
         clients_data = analysis['revenue']['clients']
         active_client_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
@@ -584,6 +700,7 @@ with tab3:
             st.info(f"💡 **PT/Reabilitare:** {clients_data.get('pt_session', 0)} clienți × ~5 sesiuni/lună = {clients_data.get('pt_session_sessions', 0)} sesiuni/lună")
     
     with col2:
+        st.markdown('<div id="parametri-demografici"></div>', unsafe_allow_html=True)
         st.markdown("### Parametri Demografici")
         demo_data = {
             'Parametru': [
@@ -607,6 +724,7 @@ with tab3:
         st.dataframe(demo_df, use_container_width=True, hide_index=True)
         
         # Vizualizare rază de influență
+        st.markdown('<div id="zona-acoperire"></div>', unsafe_allow_html=True)
         st.markdown("### Zonă de Acoperire")
         st.info(f"""
         **Suprafață acoperită:** {analysis['campaign']['area_km2']:.2f} km²
@@ -628,11 +746,13 @@ with tab4:
         coverage_rate
     )
     
+    st.markdown('<div id="tabel-comparare"></div>', unsafe_allow_html=True)
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
+        st.markdown('<div id="grafic-venituri"></div>', unsafe_allow_html=True)
         # Grafic venituri pe scenarii
         fig_comp_revenue = px.bar(
             comparison_df,
@@ -652,6 +772,7 @@ with tab4:
         st.plotly_chart(fig_comp_revenue, use_container_width=True)
     
     with col2:
+        st.markdown('<div id="grafic-raza"></div>', unsafe_allow_html=True)
         # Grafic rază influență pe scenarii
         fig_comp_radius = px.bar(
             comparison_df,
@@ -676,6 +797,15 @@ with tab4:
 
 with tab5:
     st.subheader("🗺️ Hartă Participare pe Blocuri și Cartiere")
+    
+    # Cuprins pentru tab Hartă
+    toc_items = [
+        ("harta-interactiva", "🗺️ Hartă Interactivă"),
+        ("linkuri-google-maps", "📍 Link-uri Google Maps"),
+        ("informatii-analiza", "ℹ️ Informații despre Analiză"),
+        ("detalii-blocuri", "🏘️ Detalii Blocuri și Cartiere")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
     
     # Funcție pentru calcularea distanței Haversine (în km)
     def haversine_distance(lat1, lon1, lat2, lon2):
@@ -882,6 +1012,7 @@ with tab5:
     m.get_root().html.add_child(folium.Element(legend_html))
     
     # Afișează hartă
+    st.markdown('<div id="harta-interactiva"></div>', unsafe_allow_html=True)
     st.info("💡 **Notă:** Harta necesită conexiune la internet pentru a se încărca. Dacă nu apare, verifică conexiunea.")
     
     try:
@@ -893,6 +1024,7 @@ with tab5:
         
         # Alternativă: Hărți Google Maps
         st.markdown("---")
+        st.markdown('<div id="linkuri-google-maps"></div>', unsafe_allow_html=True)
         st.markdown("### 🗺️ Hărți Google Maps - Locații Săli")
         
         # Harta noastră
@@ -928,6 +1060,7 @@ with tab5:
             st.markdown("---")
         
         # Informații despre hartă
+        st.markdown('<div id="informatii-analiza"></div>', unsafe_allow_html=True)
         st.markdown("### Informații despre Analiză")
         st.write(f"**Raza de influență:** {radius_km:.2f} km")
         st.write(f"**Număr blocuri/cartiere:** {num_blocks}")
@@ -962,6 +1095,7 @@ with tab5:
     
     # Tabel cu detalii blocuri
     st.markdown("---")
+    st.markdown('<div id="detalii-blocuri"></div>', unsafe_allow_html=True)
     st.markdown("### Detalii Blocuri și Cartiere")
     
     blocks_df = pd.DataFrame(blocks_data)
@@ -990,6 +1124,18 @@ with tab5:
 
 with tab6:
     st.subheader("Analiză Campanie la Nivel de Cartier")
+    
+    # Cuprins pentru tab Campanie
+    toc_items = [
+        ("metrici-campanie", "📊 Metrici Campanie"),
+        ("detalii-campanie", "📋 Detalii Campanie"),
+        ("funnel-conversie", "📈 Funnel Conversie"),
+        ("recomandari-campanie", "💡 Recomandări Campanie"),
+        ("cost-campanie", "💰 Estimare Cost Campanie"),
+        ("sondaj-cartier", "📋 Sondaj în Cartier"),
+        ("concurs-cartier", "🏆 Concurs de Cartier")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
     
     campaign = analysis['campaign']
     
@@ -1038,6 +1184,7 @@ with tab6:
             help="Numărul total de oameni potențial interesați în zonă"
         )
     
+    st.markdown('<div id="detalii-campanie"></div>', unsafe_allow_html=True)
     st.markdown("### Detalii Campanie")
     
     col1, col2 = st.columns(2)
@@ -1057,6 +1204,7 @@ with tab6:
         """)
     
     with col2:
+        st.markdown('<div id="funnel-conversie"></div>', unsafe_allow_html=True)
         # Grafic piramida conversiei cu tooltip-uri detaliate
         # Definiții și metode de calcul pentru fiecare etapă
         definitions = [
@@ -1114,6 +1262,7 @@ with tab6:
         
         st.plotly_chart(fig_funnel, use_container_width=True)
     
+    st.markdown('<div id="recomandari-campanie"></div>', unsafe_allow_html=True)
     st.markdown("### Recomandări Campanie")
     
     if campaign['radius_km'] <= 2:
@@ -1124,6 +1273,7 @@ with tab6:
         st.error("🔴 **Campanie amplă:** Raza de influență este mare (> 5 km). Recomandăm campanii digitale extinse: Google Ads, Facebook Ads, parteneriate cu clinici medicale, colaborări cu antrenori personali.")
     
     # Calcul cost estimativ campanie
+    st.markdown('<div id="cost-campanie"></div>', unsafe_allow_html=True)
     st.markdown("### Estimare Cost Campanie")
     
     cost_per_person = st.number_input(
@@ -1145,6 +1295,7 @@ with tab6:
     
     # Secțiune Sondaj
     st.markdown("---")
+    st.markdown('<div id="sondaj-cartier"></div>', unsafe_allow_html=True)
     st.markdown("### 📋 Sondaj în Cartier")
     
     st.markdown("""
@@ -1246,6 +1397,7 @@ with tab6:
     
     # Secțiune Concurs
     st.markdown("---")
+    st.markdown('<div id="concurs-cartier"></div>', unsafe_allow_html=True)
     st.markdown("### 🏆 Concurs de Cartier")
     
     st.markdown("""
@@ -1942,6 +2094,25 @@ with tab8:
     ---
     """)
     
+    # Cuprins pentru tab Scopul și Arhitectura Dashboard
+    toc_items = [
+        ("scop-proiect", "🎯 Scopul Proiectului"),
+        ("model-gandire", "🧠 Modelul de Gândire"),
+        ("abordare-top-down", "📊 Abordarea Top-Down"),
+        ("principii-baza", "📐 Principiile de Bază"),
+        ("logica-calcul", "🔢 Logica de Calcul"),
+        ("model-geografic", "🗺️ Modelul Geografic"),
+        ("structura-dashboard", "📊 Structura Dashboard-ului"),
+        ("design-decisions", "🎨 Design Decisions"),
+        ("flux-date", "🔄 Fluxul de Date"),
+        ("insights-cheie", "💡 Insights Cheie"),
+        ("utilizare-dashboard", "🎯 Utilizarea Dashboard-ului"),
+        ("concluzii", "📝 Concluzii"),
+        ("invataminte", "🎓 Învățăminte")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
+    
+    st.markdown('<div id="scop-proiect"></div>', unsafe_allow_html=True)
     st.markdown("""
     ## 🎯 Scopul Proiectului
     
@@ -1956,9 +2127,11 @@ with tab8:
     
     st.markdown("---")
     
+    st.markdown('<div id="model-gandire"></div>', unsafe_allow_html=True)
     st.markdown("""
     ## 🧠 Modelul de Gândire
     
+    <div id="abordare-top-down"></div>
     ### 1. Abordarea "De Sus în Jos" (Top-Down)
     
     Am pornit de la **obiectivul final** (venit dorit: 50,000 RON/lună) și am construit modelul înapoi pentru a determina ce este necesar:
@@ -1980,6 +2153,7 @@ with tab8:
     
     st.markdown("---")
     
+    st.markdown('<div id="principii-baza"></div>', unsafe_allow_html=True)
     st.markdown("""
     ### 2. Principiile de Bază
     
@@ -2071,6 +2245,7 @@ with tab8:
     
     st.markdown("---")
     
+    st.markdown('<div id="logica-calcul"></div>', unsafe_allow_html=True)
     st.markdown("""
     ## 🔢 Logica de Calcul
     
@@ -2166,6 +2341,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="model-geografic"></div>', unsafe_allow_html=True)
     ## 🗺️ Modelul Geografic
     
     ### De ce o Hartă?
@@ -2197,6 +2373,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="structura-dashboard"></div>', unsafe_allow_html=True)
     ## 📊 Structura Dashboard-ului
     
     ### De ce 8 Tab-uri?
@@ -2242,6 +2419,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="design-decisions"></div>', unsafe_allow_html=True)
     ## 🎨 Design Decisions (Decizii de Design)
     
     ### De ce Streamlit?
@@ -2268,6 +2446,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="flux-date"></div>', unsafe_allow_html=True)
     ## 🔄 Fluxul de Date
     
     ```
@@ -2289,6 +2468,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="insights-cheie"></div>', unsafe_allow_html=True)
     ## 💡 Insights Cheie
     
     ### 1. Relația între Ocupare și Venituri
@@ -2319,6 +2499,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="utilizare-dashboard"></div>', unsafe_allow_html=True)
     ## 🎯 Utilizarea Dashboard-ului
     
     ### Workflow Recomandat
@@ -2355,6 +2536,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="concluzii"></div>', unsafe_allow_html=True)
     ## 📝 Concluzii
     
     Acest dashboard este un **instrument de planificare și analiză**, nu o predicție exactă. 
@@ -2380,6 +2562,7 @@ with tab8:
     st.markdown("---")
     
     st.markdown("""
+    st.markdown('<div id="invataminte"></div>', unsafe_allow_html=True)
     ## 🎓 Învățăminte
     
     1. **Simplu este mai bun**: Dashboard-ul este simplu de folosit, nu complicat
