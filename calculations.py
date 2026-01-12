@@ -117,83 +117,62 @@ def calculate_occupied_slots(occupancy_rate: float) -> int:
 
 def calculate_clients_needed(
     occupancy_rate: float,
-    subscription_distribution: Dict[str, float],
-    pt_sessions_per_month: int = 0  # Număr de sesiuni PT/lună
+    subscription_distribution: Dict[str, float]
 ) -> Dict[str, int]:
     """
     Calculează numărul de clienți necesari pentru fiecare tip de abonament
     
     Args:
         occupancy_rate: Rata de ocupare (0-1)
-        subscription_distribution: Dict cu procentajele pentru fiecare tip de abonament
-                                  Poate include 0% pentru unele tipuri
-        pt_sessions_per_month: Număr de sesiuni PT/reabilitare pe lună
+        subscription_distribution: Dict cu procentajele pentru fiecare tip de serviciu
+                                  Toate procentajele formează 100% (inclusiv PT)
     
     Returns:
-        Dict cu numărul de clienți pentru fiecare tip
+        Dict cu numărul de clienți/sesiuni pentru fiecare tip
     """
     occupied_slots = calculate_occupied_slots(occupancy_rate)
     
-    # Separăm abonamentele lunare de cele per sesiune
-    monthly_subscriptions = {k: v for k, v in subscription_distribution.items() 
-                            if not SUBSCRIPTION_TYPES.get(k, {}).get('is_session_based', False)}
-    
-    # Calculăm slot-uri pentru abonamente lunare (excluzând PT care e per sesiune)
-    total_monthly_pct = sum(monthly_subscriptions.values())
-    if total_monthly_pct > 0:
-        slots_for_monthly = occupied_slots * (total_monthly_pct / max(total_monthly_pct, 1))
-    else:
-        slots_for_monthly = occupied_slots
-    
     clients = {}
     
-    # Pentru fiecare tip de abonament lunar
-    for sub_type, pct in monthly_subscriptions.items():
+    # Pentru fiecare tip de serviciu (inclusiv PT)
+    for sub_type, pct in subscription_distribution.items():
         if pct > 0 and sub_type in SUBSCRIPTION_TYPES:
             sub_info = SUBSCRIPTION_TYPES[sub_type]
-            sub_slots = slots_for_monthly * (pct / max(total_monthly_pct, 1))
+            # Slot-uri ocupate de acest tip = slot-uri totale × procentaj
+            sub_slots = occupied_slots * pct
             
-            # Pentru abonamente nelimitate (standard, basic, premium)
-            if sub_info.get('sessions') is None:
+            if sub_info.get('is_session_based', False):
+                # PT/Reabilitare: fiecare slot = 1 sesiune
+                # Numărul de sesiuni = numărul de slot-uri ocupate
+                clients[sub_type] = max(0, int(np.round(sub_slots)))
+            elif sub_info.get('sessions') is None:
+                # Abonamente nelimitate (standard, basic, premium)
                 # Presupunem 3 vizite pe săptămână per client
                 avg_visits_per_week = 3
                 slots_per_week = sub_slots / WEEKS_PER_MONTH
                 num_clients = max(0, int(np.ceil(slots_per_week / avg_visits_per_week)))
+                clients[sub_type] = num_clients
             else:
-                # Pentru abonamente cu sesiuni limitate (dacă ar exista)
+                # Abonamente cu sesiuni limitate (dacă ar exista)
                 num_clients = max(0, int(np.ceil(sub_slots / sub_info['sessions'])))
-            
-            clients[sub_type] = num_clients
+                clients[sub_type] = num_clients
         else:
             clients[sub_type] = 0
-    
-    # Pentru PT/Reabilitare (per sesiune)
-    if 'pt_session' in subscription_distribution and subscription_distribution['pt_session'] > 0:
-        # PT nu ocupă slot-uri normale, e un serviciu separat
-        # Folosim valoarea directă sau calculăm din procentaj
-        if pt_sessions_per_month > 0:
-            clients['pt_session'] = pt_sessions_per_month
-        else:
-            # Estimează din procentaj (presupunem că 1% = ~10 sesiuni/lună)
-            clients['pt_session'] = int(subscription_distribution['pt_session'] * 10)
-    else:
-        clients['pt_session'] = 0
     
     return clients
 
 
 def calculate_monthly_revenue(
     occupancy_rate: float,
-    subscription_distribution: Dict[str, float],
-    pt_sessions_per_month: int = 0
+    subscription_distribution: Dict[str, float]
 ) -> Dict[str, float]:
     """
     Calculează veniturile lunare
     
     Returns:
-        Dict cu venituri totale și pe tip de abonament
+        Dict cu venituri totale și pe tip de serviciu
     """
-    clients = calculate_clients_needed(occupancy_rate, subscription_distribution, pt_sessions_per_month)
+    clients = calculate_clients_needed(occupancy_rate, subscription_distribution)
     
     revenues = {}
     total_revenue = 0
@@ -287,8 +266,7 @@ def get_scenario_analysis(
     scenario: str,
     subscription_distribution: Dict[str, float],
     participation_rate: float = 0.10,
-    population_density: float = 1000,
-    pt_sessions_per_month: int = 0
+    population_density: float = 1000
 ) -> Dict:
     """
     Obține analiza completă pentru un scenariu
@@ -308,7 +286,7 @@ def get_scenario_analysis(
     avg_occupancy = (scenario_config['min'] + scenario_config['max']) / 2
     
     # Calculează venituri
-    revenue_data = calculate_monthly_revenue(avg_occupancy, subscription_distribution, pt_sessions_per_month)
+    revenue_data = calculate_monthly_revenue(avg_occupancy, subscription_distribution)
     
     # Calculează clienți totali
     total_clients = sum(revenue_data['clients'].values())
@@ -345,7 +323,7 @@ def compare_scenarios(
     results = []
     
     for scenario in ['reduced', 'medium', 'high']:
-        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density, pt_sessions_per_month)
+        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density)
         results.append({
             'Scenariu': analysis['scenario'],
             'Ocupare': analysis['occupancy_percentage'],

@@ -78,11 +78,11 @@ selected_scenario = st.sidebar.selectbox(
     index=1  # Default: Mediu
 )
 
-# Distribuție servicii - Structură extinsă
+# Distribuție servicii - Structură extinsă (toate formează 100%)
 st.sidebar.subheader("Distribuție Servicii (%)")
-st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. Poți seta 0% pentru servicii nefolosite. PT/Reabilitare se plătește per sesiune.")
+st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. PT/Reabilitare ocupă slot-uri ca orice alt serviciu.")
 
-# Abonamente lunare
+# Toate serviciile (inclusiv PT) formează 100%
 basic_pct = st.sidebar.slider(
     f"{SUBSCRIPTION_TYPES['basic']['name']} ({SUBSCRIPTION_TYPES['basic']['price']} RON/lună)",
     0, 100, 40, 5,
@@ -95,47 +95,42 @@ standard_pct = st.sidebar.slider(
 )
 premium_pct = st.sidebar.slider(
     f"{SUBSCRIPTION_TYPES['premium']['name']} ({SUBSCRIPTION_TYPES['premium']['price']} RON/lună)",
-    0, 100, 20, 5,
+    0, 100, 15, 5,
     help=SUBSCRIPTION_TYPES['premium']['description']
 )
-
-# PT/Reabilitare (per sesiune, nu procentaj)
-st.sidebar.markdown("---")
-pt_sessions_per_month = st.sidebar.number_input(
-    "Sesiuni PT/Reabilitare pe lună",
-    min_value=0,
-    max_value=500,
-    value=0,
-    step=5,
-    help=f"Număr de sesiuni PT/Reabilitare pe lună ({SUBSCRIPTION_TYPES['pt_session']['price']} RON/sesiune)"
+pt_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['pt_session']['name']} ({SUBSCRIPTION_TYPES['pt_session']['price']} RON/sesiune)",
+    0, 100, 5, 5,
+    help=f"{SUBSCRIPTION_TYPES['pt_session']['description']}. Fiecare sesiune ocupă 1 slot."
 )
 
-# Normalizare distribuție (doar pentru abonamente lunare)
-monthly_total = basic_pct + standard_pct + premium_pct
-if monthly_total == 0:
-    basic_pct, standard_pct, premium_pct = 33.33, 33.33, 33.34
-    monthly_total = 100
+# Normalizare distribuție (toate serviciile formează 100%)
+total_pct = basic_pct + standard_pct + premium_pct + pt_pct
+if total_pct == 0:
+    basic_pct, standard_pct, premium_pct, pt_pct = 40, 40, 15, 5
+    total_pct = 100
 
 # Calculează procentajele normalizate
-basic_normalized = (basic_pct / monthly_total) * 100
-standard_normalized = (standard_pct / monthly_total) * 100
-premium_normalized = (premium_pct / monthly_total) * 100
+basic_normalized = (basic_pct / total_pct) * 100
+standard_normalized = (standard_pct / total_pct) * 100
+premium_normalized = (premium_pct / total_pct) * 100
+pt_normalized = (pt_pct / total_pct) * 100
 
 # Afișează procentajele normalizate
-if monthly_total != 100:
-    st.sidebar.info(f"📊 **Distribuție normalizată:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+if total_pct != 100:
+    st.sidebar.info(f"📊 **Distribuție normalizată:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}% | PT {pt_normalized:.1f}%")
 else:
-    st.sidebar.success(f"✅ **Distribuție:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}%")
+    st.sidebar.success(f"✅ **Distribuție:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}% | PT {pt_normalized:.1f}%")
 
-if pt_sessions_per_month > 0:
-    pt_revenue = pt_sessions_per_month * SUBSCRIPTION_TYPES['pt_session']['price']
-    st.sidebar.info(f"💰 **Venit PT/Reabilitare:** {pt_revenue:,.0f} RON/lună ({pt_sessions_per_month} sesiuni)")
+# Explicație PT
+if pt_normalized > 0:
+    st.sidebar.caption(f"💡 **PT/Reabilitare:** {pt_normalized:.1f}% din slot-uri ocupate = sesiuni PT/lună (calculat automat din ocupare)")
 
 subscription_distribution = {
-    'basic': basic_pct / monthly_total,
-    'standard': standard_pct / monthly_total,
-    'premium': premium_pct / monthly_total,
-    'pt_session': 0.01 if pt_sessions_per_month > 0 else 0  # Marker pentru PT
+    'basic': basic_pct / total_pct,
+    'standard': standard_pct / total_pct,
+    'premium': premium_pct / total_pct,
+    'pt_session': pt_pct / total_pct
 }
 
 # Parametri demografici
@@ -165,8 +160,7 @@ analysis = get_scenario_analysis(
     selected_scenario,
     subscription_distribution,
     participation_rate,
-    population_density,
-    pt_sessions_per_month
+    population_density
 )
 
 # Ajustare pentru conversie în calculul campaniei
@@ -427,8 +421,7 @@ with tab4:
     comparison_df = compare_scenarios(
         subscription_distribution,
         participation_rate,
-        population_density,
-        pt_sessions_per_month
+        population_density
     )
     
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
