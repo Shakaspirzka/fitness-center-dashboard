@@ -158,13 +158,20 @@ conversion_rate = st.sidebar.slider(
     1, 20, 5, 1
 ) / 100
 
-# Calculează analiza pentru scenariul selectat (inclusiv campania cu conversie)
+coverage_rate = st.sidebar.slider(
+    "Rata de Acoperire (%)",
+    10, 100, 50, 5,
+    help="Ce procent din populația interesată trebuie atins de campanie"
+) / 100
+
+# Calculează analiza pentru scenariul selectat (inclusiv campania cu conversie și acoperire)
 analysis = get_scenario_analysis(
     selected_scenario,
     subscription_distribution,
     participation_rate,
     population_density,
-    conversion_rate
+    conversion_rate,
+    coverage_rate
 )
 
 # Main content
@@ -617,7 +624,8 @@ with tab4:
         subscription_distribution,
         participation_rate,
         population_density,
-        conversion_rate
+        conversion_rate,
+        coverage_rate
     )
     
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
@@ -1005,7 +1013,7 @@ with tab6:
         st.metric(
             "Rata Conversie",
             f"{conversion_rate*100:.1f}%",
-            help="Rata de conversie a campaniei"
+            help="Ce procent din cei atinși devin clienți"
         )
     
     with col4:
@@ -1013,6 +1021,21 @@ with tab6:
             "Suprafață (km²)",
             f"{campaign['area_km2']:.2f}",
             help="Suprafața acoperită de campanie"
+        )
+    
+    # Metric suplimentar pentru rata de acoperire
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(
+            "Rata de Acoperire",
+            f"{coverage_rate*100:.1f}%",
+            help="Ce procent din populația interesată trebuie atins de campanie"
+        )
+    with col2:
+        st.metric(
+            "Populație Interesată",
+            f"{campaign['interested_population']:,}",
+            help="Numărul total de oameni potențial interesați în zonă"
         )
     
     st.markdown("### Detalii Campanie")
@@ -1023,12 +1046,14 @@ with tab6:
         st.info(f"""
         **Dimensiune Campanie:**
         - Populație totală în zonă: **{campaign['total_population']:,}** oameni
-        - Populație potențial interesată: **{campaign['interested_population']:,}** oameni
-        - Populație de atins prin campanie: **{campaign['people_to_reach']:,}** oameni
+        - Populație potențial interesată: **{campaign['interested_population']:,}** oameni ({participation_rate*100:.1f}% din total)
+        - Populație de atins prin campanie: **{campaign['people_to_reach']:,}** oameni ({coverage_rate*100:.1f}% din cei interesați)
         
         **Acoperire Geografică:**
         - Raza: **{campaign['radius_km']:.2f} km**
         - Suprafață: **{campaign['area_km2']:.2f} km²**
+        
+        **Rata de Acoperire:** {coverage_rate*100:.1f}% din populația interesată trebuie atinsă de campanie pentru a obține clienții necesari.
         """)
     
     with col2:

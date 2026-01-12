@@ -281,43 +281,46 @@ def calculate_campaign_scale(
     total_clients_needed: int,
     participation_rate: float,
     population_density: float,
-    conversion_rate: float = 0.05  # 5% conversie din cei interesați
+    conversion_rate: float = 0.05,  # 5% conversie din cei atinși
+    coverage_rate: float = 0.50  # 50% din populația interesată trebuie atinsă
 ) -> Dict[str, float]:
     """
     Calculează dimensiunea necesară a unei campanii la nivel de cartier
     
     Logica corectă:
     1. Calculăm câți oameni trebuie atinși de campanie: total_clients_needed / conversion_rate
-    2. Acești oameni trebuie să fie din populația interesată
-    3. Calculăm câtă populație totală avem nevoie: people_to_reach / participation_rate
+    2. Calculăm câtă populație interesată avem nevoie: people_to_reach / coverage_rate
+    3. Calculăm câtă populație totală avem nevoie: interested_population_needed / participation_rate
     4. Calculăm suprafața necesară: total_population_needed / population_density
     5. Calculăm raza necesară: sqrt(area_needed / π)
     
     Args:
         total_clients_needed: Numărul total de clienți necesari
-        participation_rate: Rata de participare a populației
+        participation_rate: Rata de participare a populației (0-1)
         population_density: Densitatea populației (oameni/km²)
-        conversion_rate: Rata de conversie a campaniei (0-1)
+        conversion_rate: Rata de conversie a campaniei (0-1) - ce % din cei atinși devin clienți
+        coverage_rate: Rata de acoperire (0-1) - ce % din populația interesată trebuie atinsă
     
     Returns:
         Dict cu informații despre campanie
     """
-    if conversion_rate == 0 or participation_rate == 0 or population_density == 0:
+    if conversion_rate == 0 or participation_rate == 0 or population_density == 0 or coverage_rate == 0:
         return {
             'radius_km': 0,
             'area_km2': 0,
             'total_population': 0,
             'interested_population': 0,
             'people_to_reach': 0,
+            'coverage_rate': coverage_rate,
             'conversion_rate': conversion_rate
         }
     
     # Pasul 1: Câți oameni trebuie atinși de campanie pentru a obține clienții necesari
-    people_to_reach = total_clients_needed / conversion_rate
+    people_to_reach_needed = total_clients_needed / conversion_rate
     
-    # Pasul 2: Acești oameni trebuie să fie din populația interesată
-    # Deci avem nevoie de atâția oameni interesați
-    interested_population_needed = people_to_reach
+    # Pasul 2: Câtă populație interesată avem nevoie pentru a atinge numărul necesar
+    # Dacă vrem să atingem X oameni și rata de acoperire este Y%, atunci avem nevoie de X/Y oameni interesați
+    interested_population_needed = people_to_reach_needed / coverage_rate
     
     # Pasul 3: Calculăm câtă populație totală avem nevoie
     # pentru a avea suficienți oameni interesați
@@ -334,15 +337,16 @@ def calculate_campaign_scale(
     total_population = area * population_density
     interested_population = total_population * participation_rate
     
-    # Populația de atins este minimul dintre ce avem nevoie și ce este disponibil
-    people_to_reach_actual = min(people_to_reach, interested_population)
+    # Populația de atins este procentul din populația interesată definit de coverage_rate
+    people_to_reach = int(interested_population * coverage_rate)
     
     return {
         'radius_km': radius,
         'area_km2': area,
         'total_population': int(total_population),
         'interested_population': int(interested_population),
-        'people_to_reach': int(people_to_reach_actual),
+        'people_to_reach': people_to_reach,
+        'coverage_rate': coverage_rate,
         'conversion_rate': conversion_rate
     }
 
@@ -352,7 +356,8 @@ def get_scenario_analysis(
     subscription_distribution: Dict[str, float],
     participation_rate: float = 0.10,
     population_density: float = 1000,
-    conversion_rate: float = 0.05
+    conversion_rate: float = 0.05,
+    coverage_rate: float = 0.50
 ) -> Dict:
     """
     Obține analiza completă pentru un scenariu
@@ -378,8 +383,8 @@ def get_scenario_analysis(
     # Calculează clienți totali
     total_clients = sum(revenue_data['clients'].values())
     
-    # Calculează dimensiunea campaniei (care include raza corectă calculată cu conversie)
-    campaign_data = calculate_campaign_scale(total_clients, participation_rate, population_density, conversion_rate)
+    # Calculează dimensiunea campaniei (care include raza corectă calculată cu conversie și acoperire)
+    campaign_data = calculate_campaign_scale(total_clients, participation_rate, population_density, conversion_rate, coverage_rate)
     
     # Folosim raza din campanie (care este calculată corect ținând cont de conversie)
     radius = campaign_data['radius_km']
@@ -403,7 +408,8 @@ def compare_scenarios(
     subscription_distribution: Dict[str, float],
     participation_rate: float = 0.10,
     population_density: float = 1000,
-    conversion_rate: float = 0.05
+    conversion_rate: float = 0.05,
+    coverage_rate: float = 0.50
 ) -> pd.DataFrame:
     """
     Compară toate scenariile și returnează un DataFrame
@@ -411,7 +417,7 @@ def compare_scenarios(
     results = []
     
     for scenario in ['reduced', 'medium', 'high']:
-        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density, conversion_rate)
+        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density, conversion_rate, coverage_rate)
         results.append({
             'Scenariu': analysis['scenario'],
             'Ocupare': analysis['occupancy_percentage'],
