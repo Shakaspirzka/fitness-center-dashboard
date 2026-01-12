@@ -1057,7 +1057,29 @@ with tab6:
         """)
     
     with col2:
-        # Grafic piramida conversiei
+        # Grafic piramida conversiei cu tooltip-uri detaliate
+        # Definiții și metode de calcul pentru fiecare etapă
+        definitions = [
+            f"<b>Definiție:</b> Totalul populației care locuiește în zona acoperită de campanie.<br>"
+            f"<b>Calcul:</b> Suprafață (km²) × Densitate Populație<br>"
+            f"<b>Formula:</b> {campaign['area_km2']:.2f} km² × {population_density:,} oameni/km² = {campaign['total_population']:,} oameni",
+            
+            f"<b>Definiție:</b> Numărul de oameni din populația totală care ar putea fi interesați de serviciile fitness.<br>"
+            f"<b>Calcul:</b> Populație Totală × Rata de Participare<br>"
+            f"<b>Formula:</b> {campaign['total_population']:,} × {participation_rate*100:.1f}% = {campaign['interested_population']:,} oameni<br>"
+            f"<b>Notă:</b> Rata de participare reflectă procentul din populație care ar putea fi interesați de fitness.",
+            
+            f"<b>Definiție:</b> Numărul de oameni din populația interesată care trebuie atinși efectiv de campanie.<br>"
+            f"<b>Calcul:</b> Populație Interesată × Rata de Acoperire<br>"
+            f"<b>Formula:</b> {campaign['interested_population']:,} × {coverage_rate*100:.1f}% = {campaign['people_to_reach']:,} oameni<br>"
+            f"<b>Notă:</b> Rata de acoperire definește ce procent din cei interesați trebuie atinși pentru a obține clienții necesari.",
+            
+            f"<b>Definiție:</b> Numărul final de clienți obținuți după conversie.<br>"
+            f"<b>Calcul:</b> Populație de Atins × Rata de Conversie<br>"
+            f"<b>Formula:</b> {campaign['people_to_reach']:,} × {conversion_rate*100:.1f}% = {analysis['total_clients']:,} clienți<br>"
+            f"<b>Notă:</b> Rata de conversie reprezintă procentul din cei atinși care devin efectiv clienți."
+        ]
+        
         conversion_stages = pd.DataFrame({
             'Etapă': [
                 'Populație Totală',
@@ -1070,15 +1092,26 @@ with tab6:
                 campaign['interested_population'],
                 campaign['people_to_reach'],
                 analysis['total_clients']
-            ]
+            ],
+            'Definiție': definitions
         })
         
         fig_funnel = px.funnel(
             conversion_stages,
             x='Număr',
             y='Etapă',
-            title="Funnel Conversie Campanie"
+            title="Funnel Conversie Campanie",
+            custom_data=['Definiție']
         )
+        
+        # Actualizează tooltip-ul pentru a include definiția și metoda de calcul
+        fig_funnel.update_traces(
+            hovertemplate='<b>%{y}</b><br>' +
+                         'Număr: <b>%{x:,}</b><br>' +
+                         '<br>%{customdata[0]}<br>' +
+                         '<extra></extra>'
+        )
+        
         st.plotly_chart(fig_funnel, use_container_width=True)
     
     st.markdown("### Recomandări Campanie")
