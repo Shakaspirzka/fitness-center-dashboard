@@ -686,26 +686,27 @@ with tab5:
                 weight=2
             ).add_to(m)
     
-    # Adaugă legendă îmbunătățită - mai mare și mai lizibilă
+    # Adaugă legendă îmbunătățită - mutată în top-right pentru vizibilitate maximă
     legend_html = f'''
     <div style="position: fixed; 
-                bottom: 20px; right: 20px; width: 300px; min-height: 350px; 
-                background-color: white; border:3px solid #333; z-index:9999; 
-                font-size:15px; padding: 15px; border-radius: 8px; 
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                font-family: Arial, sans-serif;">
-    <h4 style="margin-top:0; margin-bottom:12px; font-size:18px; font-weight:bold; color:#1f77b4; border-bottom:2px solid #1f77b4; padding-bottom:5px;">Legendă</h4>
-    <p style="margin:8px 0 5px 0; font-weight:bold; font-size:16px; color:#333;">Participare Necesară:</p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:green; font-size:20px; font-weight:bold;">▢</span> <b>Ideală</b> (&lt;10%)</p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:blue; font-size:20px; font-weight:bold;">▢</span> <b>Bună</b> (10-20%)</p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:orange; font-size:20px; font-weight:bold;">▢</span> <b>Medie</b> (20-30%)</p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:red; font-size:20px; font-weight:bold;">▢</span> <b>Dificilă</b> (&gt;30%)</p>
-    <p style="margin:8px 0 5px 0; font-size:12px; color:#666; font-style:italic; border-top:1px solid #ddd; padding-top:8px;">Chenarele reprezintă blocurile/cartierele</p>
-    <hr style="margin:10px 0; border:1px solid #ddd;">
-    <p style="margin:8px 0 5px 0; font-weight:bold; font-size:16px; color:#333;">Locații:</p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:green; font-size:20px;">🏠</span> <b>Sală Noastră</b></p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:red; font-size:20px;">🏋️</span> <b>Concurenți</b></p>
-    <p style="margin:4px 0; font-size:15px;"><span style="color:#3186cc; font-size:20px;">○</span> <b>Rază influență</b> (~{radius_km:.2f} km)</p>
+                top: 80px; right: 20px; width: 320px; 
+                background-color: white; border:4px solid #1f77b4; z-index:9999; 
+                font-size:16px; padding: 18px; border-radius: 10px; 
+                box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+                font-family: Arial, sans-serif;
+                max-height: 85vh; overflow-y: auto;">
+    <h4 style="margin-top:0; margin-bottom:15px; font-size:20px; font-weight:bold; color:#1f77b4; border-bottom:3px solid #1f77b4; padding-bottom:8px;">📋 Legendă</h4>
+    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#333;">Participare Necesară:</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:green; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Ideală</b> (&lt;10%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:blue; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Bună</b> (10-20%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:orange; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Medie</b> (20-30%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:red; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Dificilă</b> (&gt;30%)</p>
+    <p style="margin:12px 0 8px 0; font-size:13px; color:#666; font-style:italic; border-top:2px solid #ddd; padding-top:10px;">Chenarele reprezintă blocurile/cartierele</p>
+    <hr style="margin:12px 0; border:2px solid #ddd;">
+    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#333;">Locații:</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:green; font-size:22px; margin-right:8px;">🏠</span> <b>Sală Noastră</b></p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:red; font-size:22px; margin-right:8px;">🏋️</span> <b>Concurenți</b></p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:#3186cc; font-size:22px; margin-right:8px;">○</span> <b>Rază influență</b> (~{radius_km:.2f} km)</p>
     </div>
     '''
     m.get_root().html.add_child(folium.Element(legend_html))
