@@ -247,9 +247,11 @@ with tab1:
     with col2:
         st.markdown("### Clienți pe Tip Abonament")
         clients_data = analysis['revenue']['clients']
+        # Filtrează doar cheile care există în SUBSCRIPTION_TYPES (exclude chei suplimentare precum 'pt_session_sessions')
+        valid_keys = [k for k in clients_data.keys() if k in SUBSCRIPTION_TYPES]
         clients_df = pd.DataFrame({
-            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in clients_data.keys()],
-            'Număr Clienți': list(clients_data.values())
+            'Tip Abonament': [SUBSCRIPTION_TYPES[k]['name'] for k in valid_keys],
+            'Număr Clienți': [clients_data[k] for k in valid_keys]
         })
         
         fig_clients = px.bar(
