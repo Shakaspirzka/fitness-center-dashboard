@@ -278,6 +278,156 @@ with tab1:
         
         Este necesară o rază de influență de **{analysis['influence_radius_km']:.2f} km**
         """)
+    
+    # Secțiune despre modelul de gândire
+    st.markdown("---")
+    st.markdown("## 🧠 Modelul de Gândire - Cum Funcționează Aplicația")
+    
+    with st.expander("📖 **Click pentru a înțelege logica din spatele calculelor**", expanded=False):
+        st.markdown("""
+        ### 🎯 Abordarea "De Sus în Jos" (Top-Down)
+        
+        Dashboard-ul folosește o abordare **top-down**, pornind de la obiectivul final (venit dorit) și construind modelul înapoi:
+        
+        ```
+        Venit Dorit (50,000 RON/lună)
+            ↓
+        Câți clienți sunt necesari?
+            ↓
+        Ce distribuție de abonamente?
+            ↓
+        Câtă ocupare a spațiului?
+            ↓
+        Câtă populație trebuie să acopăr?
+            ↓
+        Cât de mare trebuie să fie raza de influență?
+        ```
+        
+        ---
+        
+        ### 📐 Principiile de Bază
+        
+        **1. Capacitatea Spațiului**
+        - **Capacitate per oră**: 20 oameni
+        - **Program**: 10 ore/zi × 7 zile/săptămână = 70 ore/săptămână
+        - **Capacitate maximă lunară**: ~6,062 slot-uri (70 ore/săptămână × 4.33 săptămâni/lună × 20 oameni)
+        - Fiecare "slot" reprezintă o oră de utilizare a spațiului
+        
+        **2. Scenariile de Ocupare**
+        - **Redus (25-50%)**: Realist pentru primele luni
+        - **Mediu (50-75%)**: Realist după stabilizare
+        - **Ridicat (>75%)**: Optimist, necesită timp și marketing puternic
+        
+        **3. Calculul Clienților**
+        - Pentru abonamente nelimitate (Basic, Standard, Premium): presupunem **3 vizite/săptămână** per client
+        - Pentru PT/Reabilitare: fiecare slot ocupat = 1 sesiune; presupunem **5 sesiuni/lună** per client
+        - Clienții sunt calculați astfel încât să ocupe slot-urile alocate fiecărui tip de serviciu
+        
+        **4. Calculul Veniturilor**
+        - Venit = Suma (Clienți tip × Preț abonament tip)
+        - Pentru PT: Venit = Sesiuni PT × Preț per sesiune
+        
+        ---
+        
+        ### 🗺️ Raza de Influență - Logica Geografică
+        
+        Raza de influență este calculată astfel:
+        
+        1. **Populație disponibilă per km²** = Densitate populație × Rata participare
+        2. **Suprafață necesară** = Clienți necesari / Populație disponibilă per km²
+        3. **Rază** = √(Suprafață / π)
+        
+        **Exemplu:**
+        - Ai nevoie de 300 clienți
+        - Densitate: 1,000 oameni/km²
+        - Participare: 10% → 100 oameni disponibili/km²
+        - Suprafață necesară: 300 / 100 = 3 km²
+        - Rază: √(3 / 3.14) ≈ 1 km
+        
+        **De ce este important?**
+        - Știi exact cât de mare trebuie să fie zona de marketing
+        - Poți planifica campaniile geografic
+        - Poți estima costurile de marketing
+        
+        ---
+        
+        ### 📊 Distribuția Serviciilor
+        
+        Toate serviciile (inclusiv PT/Reabilitare) formează **100% din slot-uri ocupate**:
+        - Procentajele se normalizează automat
+        - PT/Reabilitare ocupă slot-uri ca orice alt serviciu
+        - Fiecare procentaj reprezintă cât din slot-urile ocupate sunt alocate acelui serviciu
+        
+        **Exemplu:**
+        - Ocupare: 60% = 3,637 slot-uri ocupate
+        - PT: 5% → 182 slot-uri = 182 sesiuni PT/lună
+        - Basic: 40% → 1,455 slot-uri → ~112 clienți (presupunând 3 vizite/săptămână)
+        
+        ---
+        
+        ### 💡 Insights Cheie
+        
+        **1. Relația între Ocupare și Venituri**
+        - Ocupare mai mare = mai mulți clienți = mai multe venituri
+        - Dar: ocupare 100% este nerealistă
+        - Scenariul mediu (50-75%) este cel mai echilibrat
+        
+        **2. Impactul Distribuției Abonamentelor**
+        - Mai mulți premium = venituri mai mari
+        - Dar: mai puțini clienți premium disponibili
+        - Echilibrul este cheia
+        
+        **3. Importanța Razei de Influență**
+        - Rază mică (<2 km) = campanie locală, mai ieftină
+        - Rază mare (>5 km) = campanie amplă, mai scumpă
+        - Planifică în consecință
+        
+        **4. Rata de Participare este Critică**
+        - 10% este o estimare conservatoare
+        - Dacă ai date reale, folosește-le
+        - Impact direct asupra razei de influență
+        
+        ---
+        
+        ### 🔄 Cum Funcționează Dashboard-ul
+        
+        **Fluxul de Date:**
+        ```
+        Utilizator ajustează filtre (ocupare, distribuție, parametri demografici)
+            ↓
+        Dashboard recalculează automat toate metricile
+            ↓
+        Rezultatele se actualizează în timp real
+            ↓
+        Utilizator vede impactul imediat
+        ```
+        
+        **De ce este important?**
+        - Nu trebuie să rulezi scripturi separate
+        - Poți explora rapid multe scenarii
+        - Înțelegi relațiile între parametri
+        
+        ---
+        
+        ### 📝 Notă Importantă
+        
+        Acest dashboard este un **instrument de planificare și analiză**, nu o predicție exactă. 
+        
+        **Valoarea lui:**
+        - Îți dă o înțelegere clară a potențialului
+        - Te ajută să planifici marketing-ul
+        - Te ajută să iei decizii informate
+        - Poți explora scenarii diferite rapid
+        
+        **Limitele:**
+        - Folosește presupuneri (rata participare, distribuție)
+        - Nu include cheltuieli (în dezvoltare)
+        - Blocurile sunt simulate (poți importa date reale)
+        
+        ---
+        
+        **💡 Pentru mai multe detalii despre modelul de gândire, vezi tab-ul "📘 Model de Gândire"**
+        """)
 
 with tab2:
     st.subheader("Analiză Venituri")
@@ -696,17 +846,17 @@ with tab5:
                 font-family: Arial, sans-serif;
                 max-height: 85vh; overflow-y: auto;">
     <h4 style="margin-top:0; margin-bottom:15px; font-size:20px; font-weight:bold; color:#1f77b4; border-bottom:3px solid #1f77b4; padding-bottom:8px;">📋 Legendă</h4>
-    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#333;">Participare Necesară:</p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:green; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Ideală</b> (&lt;10%)</p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:blue; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Bună</b> (10-20%)</p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:orange; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Medie</b> (20-30%)</p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:red; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Dificilă</b> (&gt;30%)</p>
+    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#000000;">Participare Necesară:</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:green; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Ideală</b> (&lt;10%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:blue; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Bună</b> (10-20%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:orange; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Medie</b> (20-30%)</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:red; font-size:22px; font-weight:bold; margin-right:8px;">▢</span> <b>Dificilă</b> (&gt;30%)</p>
     <p style="margin:12px 0 8px 0; font-size:13px; color:#666; font-style:italic; border-top:2px solid #ddd; padding-top:10px;">Chenarele reprezintă blocurile/cartierele</p>
     <hr style="margin:12px 0; border:2px solid #ddd;">
-    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#333;">Locații:</p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:green; font-size:22px; margin-right:8px;">🏠</span> <b>Sală Noastră</b></p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:red; font-size:22px; margin-right:8px;">🏋️</span> <b>Concurenți</b></p>
-    <p style="margin:5px 0; font-size:16px; line-height:1.6;"><span style="color:#3186cc; font-size:22px; margin-right:8px;">○</span> <b>Rază influență</b> (~{radius_km:.2f} km)</p>
+    <p style="margin:10px 0 8px 0; font-weight:bold; font-size:17px; color:#000000;">Locații:</p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:green; font-size:22px; margin-right:8px;">🏠</span> <b>Sală Noastră</b></p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:red; font-size:22px; margin-right:8px;">🏋️</span> <b>Concurenți</b></p>
+    <p style="margin:5px 0; font-size:16px; line-height:1.6; color:#000000;"><span style="color:#3186cc; font-size:22px; margin-right:8px;">○</span> <b>Rază influență</b> (~{radius_km:.2f} km)</p>
     </div>
     '''
     m.get_root().html.add_child(folium.Element(legend_html))

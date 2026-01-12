@@ -94,8 +94,8 @@ OCCUPANCY_SCENARIOS = {
 # Locație
 LOCATION = {
     'city': 'Bacau',
-    'address': 'Aleea Prieteniei nr 14',
-    'coordinates': (46.5700, 26.9120)  # Coordonate corecte pentru Aleea Prieteniei nr 14, Bacău (pe Aleea Prieteniei, nu pe Strada Războieni)
+    'address': 'Strada Prieteniei nr 14',
+    'coordinates': (46.5688, 26.9108)  # Coordonate corecte pentru Strada Prieteniei nr 14, Bacău (lângă Carrefour Express, în spatele Școlii Gimnaziale Mihai Drăgan)
 }
 
 # Coordonate concurenți (din analiza concurențială)
