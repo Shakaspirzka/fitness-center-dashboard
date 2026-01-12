@@ -1481,6 +1481,115 @@ with tab7:
     Analiza per locație confirmă că majoritatea sălilor mari din zonă funcționează constant la sau peste limita optimă de confort. 
     Noua sală nu concurează cu acestea pe volum sau preț, ci ocupă un gol clar de piață, definit de control, calitate și proximitate.
     """)
+    
+    # Secțiune 11: Recomandări
+    st.markdown("### 📌 Recomandări pentru Poziționarea Sălii")
+    st.markdown("""
+    **Locație țintă:** Strada Prieteniei nr 14, Bacău
+    
+    Iată recomandări concrete pentru a-ți poziționa sala și a-ți diferenția oferta față de concurență:
+    """)
+    
+    # 1. Capacitate și spațiu
+    st.markdown("#### 🎯 1. Capacitate și spațiu")
+    st.markdown("""
+    Dacă țintești **~60% din capacitatea unei locații mari** (ca 18GYM) → **~100–180 utilizatori simultan**.
+    
+    **Spațiu estimat de ~250–400 m²** poate fi suficient pentru această capacitate cu o configurație eficientă.
+    
+    💡 **Recomandare:** Menține raportul **8-11 mp/utilizator** pentru a garanta confortul și a diferenția experiența față de sălile de volum.
+    """)
+    
+    # 2. Structura serviciilor
+    st.markdown("#### 💡 2. Structura serviciilor")
+    st.markdown("""
+    **Abonamente flexibile:**
+    - 1 lună, 3 luni, anual
+    - Opțiuni pentru studenți / corporate
+    - Pachete scurte (săptămână / 2 săptămâni): ~80–140 lei
+    
+    **Servicii auxiliare:**
+    - Antrenor personal
+    - Cursuri de grup
+    - Nutriție
+    - Programe clare pentru obiective
+    - Servicii de recuperare și reeducare funcțională
+    
+    **Program extins:**
+    - 05:00–23:00 sau non-stop cu acces controlat pentru a concura cu City Gym
+    - Acces controlat prin aplicație de booking
+    """)
+    
+    # 3. Prețuri orientative de piață
+    st.markdown("#### 💰 3. Prețuri orientative de piață")
+    st.markdown("""
+    - **Abonament lunar standard:** ~160–230 lei (pentru acces complet)
+    - **Abonament student:** ~130–180 lei
+    - **Pachete scurte (săptămână / 2 săptămâni):** ~80–140 lei
+    - **Premium / Recovery:** ~400–600 lei
+    - **PT / Reabilitare:** ~100–150 lei/sesiune
+    """)
+    
+    # 4. Target
+    st.markdown("#### 📍 4. Target")
+    st.markdown("""
+    - **Studenți și tineri profesioniști** – abonamente accesibile, flexibilitate mare
+    - **Persoane cu program încărcat** – acces 05:00–24:00 sau 24/7
+    - **Fitness casual / hobby** – clase conduse și planuri de antrenament ușor de urmat
+    - **Persoane cu nevoi de recuperare** – servicii specializate PT/Reabilitare
+    """)
+    
+    # 5. Aplicație de Booking
+    st.markdown("#### 📱 5. Aplicație de Booking – Garantarea Spațiului Sufficient")
+    st.markdown("""
+    **De ce este esențială o aplicație de booking?**
+    
+    Pentru a-ți diferenția sala și a garanta clienților că vor avea **spațiu suficient** pentru a-și desfășura programul de antrenament, 
+    este crucial să dezvolți o **aplicație de booking** care să:
+    
+    ✅ **Garantează disponibilitatea** – Clienții văd în timp real disponibilitatea între anumite intervale orare
+    
+    ✅ **Arată tipurile de aparate disponibile** – Fiecare client poate rezerva accesul la tipurile de echipamente de care are nevoie
+    
+    ✅ **Previne aglomerația** – Sistemul limitează automat numărul de rezervări per interval orar, asigurând raportul optim mp/utilizator
+    
+    ✅ **Creează încredere** – Clienții știu că nu vor ajunge la sală și să găsească toate aparatele ocupate
+    
+    ✅ **Diferențiere competitivă** – Niciun competitor din zonă nu oferă acest nivel de control și predictibilitate
+    
+    **Funcționalități recomandate pentru aplicație:**
+    
+    - **Rezervare pe intervale orare** (ex: 08:00-09:00, 09:00-10:00, etc.)
+    - **Vizualizare disponibilitate pe tipuri de aparate** (cardio, forță, funcțional, etc.)
+    - **Limitare automată a numărului de rezervări** per interval (bazat pe capacitatea optimă)
+    - **Notificări înainte de rezervare** pentru a-ți confirma prezența
+    - **Sistem de așteptare** pentru intervalele populare
+    - **Istoric rezervări** și statistici personale
+    - **Integrare cu sistemul de abonamente** – doar membrii activi pot rezerva
+    
+    **Impact asupra modelului de business:**
+    
+    - **Retenție crescută** – Clienții apreciază predictibilitatea și confortul
+    - **Diferențiere clară** – "Nu stai la coadă" devine o promisiune verificabilă, nu doar marketing
+    - **Optimizare capacitate** – Poți distribui mai eficient utilizatorii pe toată ziua
+    - **Date valoroase** – Înțelegi pattern-urile de utilizare și poți optimiza programul și echipamentele
+    """)
+    
+    # Concluzie rapidă
+    st.markdown("#### 📌 Concluzie Rapidă")
+    st.markdown("""
+    👉 **Piața din Bacău este destul de diversificată:** de la săli mari și bine echipate până la studiouri locale mici.
+    
+    👉 **Pentru un plan de afaceri, propunerea de valoare ar trebui să combine:**
+    - Preț competitiv
+    - Program flexibil
+    - Servicii personalizate
+    - **Control al capacității prin aplicație de booking** (diferențiator cheie)
+    
+    👉 **Analizează fluxul real de clienți** (ore de vârf, zone dense) pentru a dimensiona corect capacitatea și abonamentele.
+    
+    👉 **Aplicația de booking nu este doar un tool tehnologic, ci o componentă esențială a modelului de business** care transformă promisiunea "fără aglomerație" într-o realitate măsurabilă și verificabilă.
+    """)
 
 # Tab 8: Scopul și Arhitectura Dashboard
 with tab8:
