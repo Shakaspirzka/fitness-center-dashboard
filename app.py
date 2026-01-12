@@ -492,10 +492,10 @@ with tab5:
     num_blocks = 20
     blocks_data = []
     
-    # Creează hartă centrată pe locație
+    # Creează hartă centrată pe locație (zoom optimizat pentru Bacău)
     m = folium.Map(
         location=[center_lat, center_lon],
-        zoom_start=13,
+        zoom_start=14,  # Zoom mai apropiat pentru a vedea mai bine detaliile
         tiles='OpenStreetMap'
     )
     
