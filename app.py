@@ -1105,6 +1105,8 @@ with tab7:
     background_image_path = None
     if os.path.exists("harta_sali.png"):
         background_image_path = "harta_sali.png"
+    elif os.path.exists(r"C:\Users\D\Desktop\fundal_corect.png"):
+        background_image_path = r"C:\Users\D\Desktop\fundal_corect.png"
     elif os.path.exists(r"C:\Users\D\Desktop\harta sali.png"):
         background_image_path = r"C:\Users\D\Desktop\harta sali.png"
     
