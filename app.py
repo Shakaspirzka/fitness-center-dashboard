@@ -207,14 +207,15 @@ with col4:
     )
 
 # Tabs pentru diferite vizualizări
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📊 Rezumat", 
     "💰 Venituri", 
     "👥 Clienți & Demografie", 
     "📈 Comparare Scenarii",
     "🗺️ Hartă Participare",
     "🎯 Campanie",
-    "🏆 Analiză Concurențială"
+    "🏆 Analiză Concurențială",
+    "📘 Model de Gândire"
 ])
 
 with tab1:
@@ -1245,6 +1246,467 @@ with tab7:
     
     Analiza per locație confirmă că majoritatea sălilor mari din zonă funcționează constant la sau peste limita optimă de confort. 
     Noua sală nu concurează cu acestea pe volum sau preț, ci ocupă un gol clar de piață, definit de control, calitate și proximitate.
+    """)
+
+# Tab 8: Model de Gândire
+with tab8:
+    st.markdown("""
+    # 📘 Model de Gândire și Arhitectură Dashboard
+    ## Analiză Potențial Spațiu Fitness & Recuperare - Bacau
+    
+    ---
+    """)
+    
+    st.markdown("""
+    ## 🎯 Scopul Proiectului
+    
+    Acest dashboard a fost creat pentru a analiza potențialul unui spațiu de fitness și recuperare post-operatorie în Bacau, Aleea Prieteniei nr 14. 
+    Obiectivul principal este de a răspunde la întrebări critice pentru o decizie de investiție:
+    
+    - **Cât venit pot genera?**
+    - **Câți clienți am nevoie?**
+    - **Cât de mare trebuie să fie zona de acoperire?**
+    - **Ce tip de campanie de marketing trebuie să fac?**
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🧠 Modelul de Gândire
+    
+    ### 1. Abordarea "De Sus în Jos" (Top-Down)
+    
+    Am pornit de la **obiectivul final** (venit dorit: 50,000 RON/lună) și am construit modelul înapoi pentru a determina ce este necesar:
+    
+    ```
+    Venit Dorit (50,000 RON/lună)
+        ↓
+    Câți clienți sunt necesari?
+        ↓
+    Ce distribuție de abonamente?
+        ↓
+    Câtă ocupare a spațiului?
+        ↓
+    Câtă populație trebuie să acopăr?
+        ↓
+    Cât de mare trebuie să fie raza de influență?
+    ```
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### 2. Principiile de Bază
+    
+    #### A. Capacitatea Spațiului
+    - **Capacitate per oră**: 20 oameni
+    - **Program**: 10 ore/zi × 7 zile/săptămână
+    - **Capacitate maximă lunară**: ~6,062 slot-uri
+    
+    **De ce?** 
+    - Trebuie să știm cât de mult poate produce spațiul
+    - Fiecare "slot" reprezintă o oră de utilizare a spațiului
+    - Aceasta este baza pentru toate calculele
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    #### B. Scenariile de Ocupare
+    Am definit 3 scenarii pentru a acoperi diferite realități:
+    
+    1. **Redus (25-50%)**: Realist pentru primele luni
+    2. **Mediu (50-75%)**: Realist după stabilizare
+    3. **Ridicat (>75%)**: Optimist, necesită timp și marketing puternic
+    
+    **De ce scenarii?**
+    - Nu putem prezice exact viitorul
+    - Trebuie să vedem mai multe opțiuni
+    - Fiecare scenariu are implicații diferite pentru marketing și investiții
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    #### C. Dimensionarea Spațiului – Indicatorul mp / Utilizator
+    
+    În fitness, confortul perceput nu este determinat de suprafața totală a sălii, ci de raportul dintre suprafață și numărul de utilizatori simultan. 
+    Acest indicator măsoară experiența fizică și diferențiază modelul controlat de sălile de volum.
+    
+    **Ipoteze concrete:**
+    - Suprafață totală: 400 mp (interval recomandat: 350-450 mp)
+    - Utilizatori simultan: 50 persoane (interval țintă: 40-60 persoane)
+    - Calcul: 400 mp / 50 utilizatori = **8 mp/utilizator**
+    
+    **Formula de calcul:**
+    ```
+    mp/utilizator = Suprafață totală (mp) / Număr utilizatori simultan
+    ```
+    
+    **Praguri de interpretare:**
+    - **Sub 6 mp/utilizator**: Aglomerație percepută, experiență negativă
+    - **6-8 mp/utilizator**: Acceptabil, dar la limita confortului
+    - **8-11 mp/utilizator**: Confort optim, experiență premium (interval țintă)
+    - **Peste 11 mp/utilizator**: Spațiu generos, dar potențial subutilizat
+    
+    **Legătura cu ocuparea țintă (55-65%):**
+    - La ocupare 55-65%, cu 50 utilizatori simultan, raportul mp/utilizator rămâne în intervalul 8-11 mp
+    - Ocupare peste 70% reduce raportul sub 8 mp/utilizator, afectând confortul
+    - Ocupare sub 50% crește raportul peste 11 mp/utilizator, indicând subutilizare
+    
+    **Impact asupra retenției clienților:**
+    - Raport sub 6 mp/utilizator: Risc crescut de abandon (clienții percep aglomerația)
+    - Raport 8-11 mp/utilizator: Retenție optimă (confort perceput, fără senzație de aglomerație)
+    - Raport peste 11 mp/utilizator: Retenție bună, dar eficiență economică redusă
+    
+    **Diferențierea față de sălile de volum:**
+    - Săli mari (RedGym, CityGym): 4-6 mp/utilizator la orele de vârf
+    - Sala noastră (model controlat): 8-11 mp/utilizator constant
+    - Avantaj competitiv: "Nu stai la coadă" vs "Avem aparate noi"
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    #### D. Tipurile de Abonamente
+    
+    Am creat 4 tipuri care acoperă diferite segmente de piață:
+    
+    1. **Basic Controlat (140 RON)**: Pentru clienți cu buget redus, acces controlat
+    2. **Standard (200 RON)**: Abonament de bază, nelimitat
+    3. **Premium / Recovery (500 RON)**: Cu servicii speciale de recuperare
+    4. **PT / Reabilitare (125 RON/sesiune)**: Servicii personalizate, marjă ridicată
+    
+    **Logica:**
+    - Diversificare = stabilitate financiară
+    - Fiecare segment are nevoi diferite
+    - Distribuția abonamentelor afectează direct veniturile
+    - PT/Reabilitare este integrat în distribuția de 100% (nu contor separat)
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🔢 Logica de Calcul
+    
+    ### 1. Calculul Clienților Necesari
+    
+    #### Pentru Abonamente cu Sesiuni Limitate:
+    ```
+    Slot-uri ocupate de tipul X = Total slot-uri ocupate × % distribuție tip X
+    Clienți necesari = Slot-uri ocupate / Sesiuni per abonament
+    ```
+    
+    #### Pentru Abonament Standard (Nelimitat):
+    ```
+    Presupunem: 3 vizite pe săptămână per client
+    Slot-uri pe săptămână = Slot-uri standard / 4.33 săptămâni
+    Clienți = Slot-uri pe săptămână / 3 vizite
+    ```
+    
+    **De ce 3 vizite?**
+    - Media industriei pentru abonamente nelimitate
+    - Poate fi ajustat în funcție de date reale
+    - Reflectă utilizarea reală (nu toți vin zilnic)
+    
+    #### Pentru PT/Reabilitare (Sesiuni):
+    ```
+    Sesiuni PT = Slot-uri ocupate × % PT
+    Clienți PT = Sesiuni PT / 5 sesiuni per client (medie)
+    ```
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### 2. Calculul Veniturilor
+    
+    ```
+    Venit Total = Σ (Clienți tip × Preț abonament tip)
+    ```
+    
+    Pentru PT/Reabilitare:
+    ```
+    Venit PT = Sesiuni PT × Preț per sesiune
+    ```
+    
+    **Simplu și direct:**
+    - Fiecare client plătește prețul abonamentului său
+    - Suma tuturor = venit total
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### 3. Calculul Razei de Influență
+    
+    Aceasta este partea cea mai interesantă și utilă:
+    
+    ```
+    Populație disponibilă per km² = Densitate populație × Rata participare
+    Suprafață necesară = Clienți necesari / Populație disponibilă per km²
+    Rază = √(Suprafață / π)
+    ```
+    
+    **Exemplu concret:**
+    - Ai nevoie de 300 clienți
+    - Densitate: 1,000 oameni/km²
+    - Participare: 10% (100 oameni disponibili/km²)
+    - Suprafață necesară: 300 / 100 = 3 km²
+    - Rază: √(3 / 3.14) = 0.98 km ≈ 1 km
+    
+    **De ce este important?**
+    - Știi exact cât de mare trebuie să fie zona de marketing
+    - Poți planifica campaniile geografic
+    - Poți estima costurile de marketing
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### 4. Calculul Dimensiunii Campaniei
+    
+    ```
+    Populație totală în zonă = π × rază² × densitate
+    Populație interesată = Populație totală × rata participare
+    Populație țintă = Clienți necesari / rata conversie
+    ```
+    
+    **Rata conversie:**
+    - Presupunem 5% (din cei interesați devin clienți)
+    - Poate fi ajustată în funcție de experiență
+    - Reflectă realitatea campaniilor de marketing
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🗺️ Modelul Geografic
+    
+    ### De ce o Hartă?
+    
+    1. **Vizualizare Concretă**: Vezi exact zona de acoperire
+    2. **Planificare Marketing**: Știi unde să te concentrezi
+    3. **Blocuri și Cartiere**: Participare diferită bazată pe distanță
+    
+    ### Logica Participării pe Blocuri
+    
+    Am creat un model simplu dar eficient:
+    
+    ```
+    Distanță de la sală → Participare
+    - Foarte aproape (<30% rază): Participare +30%
+    - Aproape (30-60% rază): Participare normală
+    - Departe (60-90% rază): Participare -30%
+    - Foarte departe (>90% rază): Participare -50%
+    ```
+    
+    **De ce?**
+    - Oamenii preferă să meargă la sală aproape de casă
+    - Distanța afectează frecvența
+    - Realitatea: mai aproape = mai mulți clienți
+    
+    **Notă:** Blocurile sunt reprezentate ca poligoane (chenare) pe hartă, fiecare afișând participarea necesară pentru a atinge obiectivul.
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 📊 Structura Dashboard-ului
+    
+    ### De ce 8 Tab-uri?
+    
+    Fiecare tab răspunde la o întrebare specifică:
+    
+    1. **📊 Rezumat**: "Ce am în general?"
+       - Vedere de ansamblu rapidă
+       - Toate metricile importante într-un loc
+    
+    2. **💰 Venituri**: "Cât pot câștiga?"
+       - Detalii pe tip de abonament
+       - Comparație cu obiectivul (50,000 RON)
+    
+    3. **👥 Clienți & Demografie**: "Câți clienți am nevoie?"
+       - Distribuție clienți
+       - Parametri demografici necesari
+    
+    4. **📈 Comparare Scenarii**: "Care scenariu este cel mai bun?"
+       - Vezi toate opțiunile simultan
+       - Compară venituri, clienți, raze
+    
+    5. **🗺️ Hartă Participare**: "Unde trebuie să mă concentrez?"
+       - Vizualizare geografică
+       - Blocuri cu participare diferită
+    
+    6. **🎯 Campanie**: "Ce campanie trebuie să fac?"
+       - Dimensiune necesară
+       - Costuri estimate
+       - Recomandări strategice
+    
+    7. **🏆 Analiză Concurențială**: "Cum mă poziționez față de concurență?"
+       - Comparație capacitate, prețuri, model
+       - Avantaje competitive
+       - Layout și eficiență spațială
+    
+    8. **📘 Model de Gândire**: "Cum funcționează totul?" (acest tab)
+       - Explicații detaliate
+       - Logica din spatele calculelor
+       - Înțelegere completă a modelului
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🎨 Design Decisions (Decizii de Design)
+    
+    ### De ce Streamlit?
+    
+    1. **Rapid de dezvoltat**: Dashboard funcțional în timp scurt
+    2. **Interactiv**: Utilizatorul poate explora scenarii
+    3. **Ușor de folosit**: Nu necesită cunoștințe tehnice avansate
+    4. **Gratuit**: Open source, fără costuri
+    
+    ### De ce Python?
+    
+    1. **Biblioteci puternice**: pandas, numpy pentru calcule
+    2. **Vizualizări**: plotly pentru graficuri interactive
+    3. **Hărți**: folium pentru hărți interactive
+    4. **Comunitate mare**: Multe resurse și suport
+    
+    ### De ce Calcule Dinamice?
+    
+    - **Flexibilitate**: Utilizatorul poate explora scenarii diferite
+    - **Înțelegere**: Vezi imediat impactul schimbărilor
+    - **Decizii informate**: Nu doar un număr, ci o înțelegere completă
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🔄 Fluxul de Date
+    
+    ```
+    Utilizator ajustează filtre
+        ↓
+    Dashboard recalculează automat
+        ↓
+    Rezultatele se actualizează în timp real
+        ↓
+    Utilizator vede impactul imediat
+    ```
+    
+    **De ce este important?**
+    - Nu trebuie să rulezi scripturi separate
+    - Poți explora rapid multe scenarii
+    - Înțelegi relațiile între parametri
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 💡 Insights Cheie
+    
+    ### 1. Relația între Ocupare și Venituri
+    
+    - Ocupare mai mare = mai mulți clienți = mai multe venituri
+    - Dar: ocupare 100% este nerealistă
+    - Scenariul mediu (50-75%) este cel mai echilibrat
+    
+    ### 2. Impactul Distribuției Abonamentelor
+    
+    - Mai mulți premium = venituri mai mari
+    - Dar: mai puțini clienți premium disponibili
+    - Echilibrul este cheia
+    
+    ### 3. Importanța Razei de Influență
+    
+    - Rază mică (<2 km) = campanie locală, mai ieftină
+    - Rază mare (>5 km) = campanie amplă, mai scumpă
+    - Planifică în consecință
+    
+    ### 4. Rata de Participare este Critică
+    
+    - 10% este o estimare conservatoare
+    - Dacă ai date reale, folosește-le
+    - Impact direct asupra razei de influență
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🎯 Utilizarea Dashboard-ului
+    
+    ### Workflow Recomandat
+    
+    1. **Începe cu Scenariul Mediu**
+       - Cel mai realist
+       - Baza pentru planificare
+    
+    2. **Ajustează Distribuția Abonamentelor**
+       - Încearcă diferite combinații
+       - Vezi impactul asupra veniturilor
+    
+    3. **Explorează Parametrii Demografici**
+       - Schimbă rata de participare
+       - Vezi cum se modifică raza de influență
+    
+    4. **Compară Scenariile**
+       - Vezi diferențele
+       - Alege cel mai potrivit pentru tine
+    
+    5. **Analizează Harta**
+       - Vezi zona de acoperire
+       - Planifică campania geografic
+    
+    6. **Planifică Campania**
+       - Vezi dimensiunea necesară
+       - Estimează costurile
+    
+    7. **Analizează Concurența**
+       - Înțelege poziționarea ta
+       - Identifică avantajele competitive
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 📝 Concluzii
+    
+    Acest dashboard este un **instrument de planificare și analiză**, nu o predicție exactă. 
+    
+    **Valoarea lui:**
+    - Îți dă o înțelegere clară a potențialului
+    - Te ajută să planifici marketing-ul
+    - Te ajută să iei decizii informate
+    - Poți explora scenarii diferite rapid
+    
+    **Limitele:**
+    - Folosește presupuneri (rata participare, distribuție)
+    - Nu include cheltuieli (în dezvoltare)
+    - Blocurile sunt simulate (poți importa date reale)
+    
+    **Cum să-l folosești:**
+    - Ca punct de plecare pentru analiză
+    - Pentru a explora scenarii diferite
+    - Pentru a planifica campaniile
+    - Pentru a discuta cu investitori/parteneri
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ## 🎓 Învățăminte
+    
+    1. **Simplu este mai bun**: Dashboard-ul este simplu de folosit, nu complicat
+    2. **Interactivitate contează**: Poți explora scenarii rapid
+    3. **Vizualizările ajută**: Hărțile și graficurile fac datele mai ușor de înțeles
+    4. **Documentația este esențială**: Fiecare utilizator are nevoi diferite
+    
+    ---
+    
+    **Document creat pentru a ajuta utilizatorii noi să înțeleagă nu doar "cum" funcționează dashboard-ul, ci și "de ce" a fost construit așa și "ce" înseamnă fiecare calcul.**
+    
+    **Succes în utilizarea dashboard-ului! 🚀**
     """)
 
 # Footer
