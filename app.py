@@ -1461,19 +1461,6 @@ with tab7:
         for item in profitability['conclusion']['win_by']:
             st.write(f"• {item}")
     
-    # Secțiune 10: Verdict Final
-    st.markdown("### ✅ Verdict Final")
-    
-    verdict_items = [
-        "✅ Locația este validată",
-        "✅ Capacitatea este corect dimensionată",
-        "✅ Modelul este matur și sustenabil",
-        "✅ Poziționarea optimă este anti-aglomerație, nu anti-preț"
-    ]
-    
-    for item in verdict_items:
-        st.write(item)
-    
     st.markdown("---")
     st.markdown("""
     **Concluzie Strategică:**
