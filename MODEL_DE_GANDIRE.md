@@ -58,7 +58,49 @@ Am definit 3 scenarii pentru a acoperi diferite realități:
 - Trebuie să vedem mai multe opțiuni
 - Fiecare scenariu are implicații diferite pentru marketing și investiții
 
-#### C. Tipurile de Abonamente
+#### C. Dimensionarea Spațiului – Indicatorul mp / Utilizator
+
+În fitness, confortul perceput nu este determinat de suprafața totală a sălii, ci de raportul dintre suprafață și numărul de utilizatori simultan. Acest indicator măsoară experiența fizică și diferențiază modelul controlat de sălile de volum.
+
+**Ipoteze concrete:**
+- Suprafață totală: 400 mp (interval recomandat: 350-450 mp)
+- Utilizatori simultan: 50 persoane (interval țintă: 40-60 persoane)
+- Calcul: 400 mp / 50 utilizatori = 8 mp/utilizator
+
+**Formula de calcul:**
+```
+mp/utilizator = Suprafață totală (mp) / Număr utilizatori simultan
+```
+
+**Praguri de interpretare:**
+- **Sub 6 mp/utilizator**: Aglomerație percepută, experiență negativă
+- **6-8 mp/utilizator**: Acceptabil, dar la limita confortului
+- **8-11 mp/utilizator**: Confort optim, experiență premium (interval țintă)
+- **Peste 11 mp/utilizator**: Spațiu generos, dar potențial subutilizat
+
+**Legătura cu ocuparea țintă (55-65%):**
+- La ocupare 55-65%, cu 50 utilizatori simultan, raportul mp/utilizator rămâne în intervalul 8-11 mp
+- Ocupare peste 70% reduce raportul sub 8 mp/utilizator, afectând confortul
+- Ocupare sub 50% crește raportul peste 11 mp/utilizator, indicând subutilizare
+
+**Impact asupra retenției clienților:**
+- Raport sub 6 mp/utilizator: Risc crescut de abandon (clienții percep aglomerația)
+- Raport 8-11 mp/utilizator: Retenție optimă (confort perceput, fără senzație de aglomerație)
+- Raport peste 11 mp/utilizator: Retenție bună, dar eficiență economică redusă
+
+**Diferențierea față de sălile de volum:**
+- Săli mari (RedGym, CityGym): 4-6 mp/utilizator la orele de vârf
+- Sala noastră (model controlat): 8-11 mp/utilizator constant
+- Avantaj competitiv: "Nu stai la coadă" vs "Avem aparate noi"
+
+**Aplicație practică:**
+- La 400 mp și 50 utilizatori simultan: 8 mp/utilizator (confort optim)
+- La 400 mp și 60 utilizatori simultan: 6.7 mp/utilizator (limita acceptabilă)
+- La 400 mp și 70 utilizatori simultan: 5.7 mp/utilizator (aglomerație percepută)
+
+Acest indicator validează modelul de capacitate controlată și justifică poziționarea premium față de sălile de volum.
+
+#### D. Tipurile de Abonamente
 Am creat 3 tipuri care acoperă diferite segmente de piață:
 
 1. **Economic (100 RON)**: Pentru clienți cu buget redus, 10 sesiuni/lună
