@@ -95,38 +95,39 @@ OCCUPANCY_SCENARIOS = {
 LOCATION = {
     'city': 'Bacau',
     'address': 'Aleea Prieteniei nr 14',
-    'coordinates': (46.5675, 26.9090)  # Coordonate precise pentru Aleea Prieteniei nr 14, Bacău (zona centrală)
+    'coordinates': (46.5685, 26.9105)  # Coordonate corecte pentru Aleea Prieteniei nr 14, Bacău (pe Strada Prieteniei)
 }
 
 # Coordonate concurenți (din analiza concurențială)
+# Coordonate corectate pentru a reflecta pozițiile reale pe hartă
 COMPETITOR_LOCATIONS = {
     'redgym': {
         'name': 'RedGym',
-        'coordinates': (46.5700, 26.9050),  # Aproximativ în zona centrală Bacău
+        'coordinates': (46.5710, 26.9080),  # Zona centrală Bacău, corectat
         'color': 'red',
         'icon': 'dumbbell'
     },
     'citygym': {
         'name': 'City Gym Arena Mall',
-        'coordinates': (46.5750, 26.9200),  # Zona mall/comercială
+        'coordinates': (46.5760, 26.9220),  # Zona mall/comercială, corectat
         'color': 'blue',
         'icon': 'shopping-cart'
     },
     'gymnastic_club': {
         'name': 'Gymnastic Club',
-        'coordinates': (46.5650, 26.9000),  # Zona sud-vest
+        'coordinates': (46.5660, 26.9020),  # Zona sud-vest, corectat
         'color': 'orange',
         'icon': 'star'
     },
     'pole_fitness': {
         'name': 'Pole Fitness Bacau',
-        'coordinates': (46.5720, 26.9150),  # Zona centrală
+        'coordinates': (46.5730, 26.9170),  # Zona centrală, corectat
         'color': 'purple',
         'icon': 'heart'
     },
     'q_fitt': {
         'name': 'Q Fitt Bacau',
-        'coordinates': (46.5730, 26.9180),  # Zona centrală
+        'coordinates': (46.5740, 26.9200),  # Zona centrală, corectat
         'color': 'darkred',
         'icon': 'fire'
     }

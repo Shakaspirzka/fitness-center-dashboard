@@ -686,24 +686,26 @@ with tab5:
                 weight=2
             ).add_to(m)
     
-    # Adaugă legendă
+    # Adaugă legendă îmbunătățită - mai mare și mai lizibilă
     legend_html = f'''
     <div style="position: fixed; 
-                bottom: 50px; right: 50px; width: 240px; height: 310px; 
-                background-color: white; border:2px solid grey; z-index:9999; 
-                font-size:13px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2)">
-    <h4 style="margin-top:0; font-size:14px">Legendă</h4>
-    <p style="margin:5px 0"><b>Participare Necesară:</b></p>
-    <p style="margin:2px 0"><span style="color:green; font-size:16px">▢</span> Ridicată (>130%)</p>
-    <p style="margin:2px 0"><span style="color:blue; font-size:16px">▢</span> Medie (100%)</p>
-    <p style="margin:2px 0"><span style="color:orange; font-size:16px">▢</span> Moderată (70%)</p>
-    <p style="margin:2px 0"><span style="color:red; font-size:16px">▢</span> Redusă (50%)</p>
-    <p style="margin:2px 0; font-size:11px; color:#666; font-style:italic">Chenarele reprezintă blocurile/cartierele</p>
-    <hr style="margin:8px 0">
-    <p style="margin:5px 0"><b>Locații:</b></p>
-    <p style="margin:2px 0"><span style="color:green; font-size:16px">🏠</span> Sala Noastră</p>
-    <p style="margin:2px 0"><span style="color:red; font-size:16px">🏋️</span> Concurenți</p>
-    <p style="margin:2px 0"><span style="color:#3186cc; font-size:16px">○</span> Raza influență ({radius_km:.2f} km)</p>
+                bottom: 20px; right: 20px; width: 300px; min-height: 350px; 
+                background-color: white; border:3px solid #333; z-index:9999; 
+                font-size:15px; padding: 15px; border-radius: 8px; 
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                font-family: Arial, sans-serif;">
+    <h4 style="margin-top:0; margin-bottom:12px; font-size:18px; font-weight:bold; color:#1f77b4; border-bottom:2px solid #1f77b4; padding-bottom:5px;">Legendă</h4>
+    <p style="margin:8px 0 5px 0; font-weight:bold; font-size:16px; color:#333;">Participare Necesară:</p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:green; font-size:20px; font-weight:bold;">▢</span> <b>Ideală</b> (&lt;10%)</p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:blue; font-size:20px; font-weight:bold;">▢</span> <b>Bună</b> (10-20%)</p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:orange; font-size:20px; font-weight:bold;">▢</span> <b>Medie</b> (20-30%)</p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:red; font-size:20px; font-weight:bold;">▢</span> <b>Dificilă</b> (&gt;30%)</p>
+    <p style="margin:8px 0 5px 0; font-size:12px; color:#666; font-style:italic; border-top:1px solid #ddd; padding-top:8px;">Chenarele reprezintă blocurile/cartierele</p>
+    <hr style="margin:10px 0; border:1px solid #ddd;">
+    <p style="margin:8px 0 5px 0; font-weight:bold; font-size:16px; color:#333;">Locații:</p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:green; font-size:20px;">🏠</span> <b>Sală Noastră</b></p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:red; font-size:20px;">🏋️</span> <b>Concurenți</b></p>
+    <p style="margin:4px 0; font-size:15px;"><span style="color:#3186cc; font-size:20px;">○</span> <b>Rază influență</b> (~{radius_km:.2f} km)</p>
     </div>
     '''
     m.get_root().html.add_child(folium.Element(legend_html))
