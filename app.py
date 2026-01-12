@@ -1098,7 +1098,79 @@ with tab7:
     competitors = get_competitors_comparison()
     market_pos = calculate_market_position(analysis['total_clients'], CAPACITY_PER_HOUR)
     
+    # Cuprins interactiv cu scroll smooth
+    st.markdown("""
+    <style>
+    .toc-container {
+        background-color: #f0f2f6;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border-left: 5px solid #1f77b4;
+    }
+    .toc-container h3 {
+        margin-top: 0;
+        color: #1f77b4;
+    }
+    .toc-container ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .toc-container li {
+        margin: 8px 0;
+    }
+    .toc-container a {
+        text-decoration: none;
+        color: #1f77b4;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    .toc-container a:hover {
+        color: #0d5a8a;
+        text-decoration: underline;
+    }
+    html {
+        scroll-behavior: smooth;
+    }
+    </style>
+    <div class="toc-container">
+    <h3>📑 Cuprins</h3>
+    <ul>
+        <li><a href="#pozitionare-strategica">🎯 1. Poziționare Strategică</a></li>
+        <li><a href="#capacitate-optima">📊 2. Capacitate Optimă</a></li>
+        <li><a href="#comparare-concurenti">🏢 3. Comparare cu Concurenți</a></li>
+        <li><a href="#pozitionare-piata">📈 4. Poziționare în Piață</a></li>
+        <li><a href="#raza-influenta">🗺️ 5. Raza de Influență</a></li>
+        <li><a href="#layout-comparativ">📐 6. Layout Comparativ (mp/om)</a></li>
+        <li><a href="#layout-recomandat">🏗️ 7. Layout Recomandat</a></li>
+        <li><a href="#simulare-redgym">🔮 8. Simulare RedGym Nouă Locație</a></li>
+        <li><a href="#profitabilitate">💰 9. Profitabilitate</a></li>
+        <li><a href="#concluzie-strategica">📋 10. Concluzie Strategică</a></li>
+        <li><a href="#recomandari">📌 11. Recomandări pentru Poziționare</a></li>
+    </ul>
+    </div>
+    <script>
+    document.querySelectorAll('.toc-container a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const offset = 80; // Offset pentru header-ul Streamlit
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    </script>
+    """, unsafe_allow_html=True)
+    
     # Secțiune 1: Poziționare Strategică
+    st.markdown('<div id="pozitionare-strategica"></div>', unsafe_allow_html=True)
     st.markdown("### 🎯 Poziționare Strategică")
     st.info(f"**{positioning['positioning']}**")
     
@@ -1115,6 +1187,7 @@ with tab7:
             st.write(f"• {item}")
     
     # Secțiune 2: Capacitate Optimă
+    st.markdown('<div id="capacitate-optima"></div>', unsafe_allow_html=True)
     st.markdown("### 📊 Capacitate Optimă")
     col1, col2, col3, col4 = st.columns(4)
     
@@ -1130,6 +1203,7 @@ with tab7:
     st.warning(f"**Notă:** Depășirea constantă a pragului de {positioning['optimal_capacity']['warning_threshold']} afectează negativ experiența și retenția.")
     
     # Secțiune 3: Comparare cu Concurenți
+    st.markdown('<div id="comparare-concurenti"></div>', unsafe_allow_html=True)
     st.markdown("### 🏢 Comparare cu Concurenți")
     
     # Grafic comparativ capacitate
@@ -1173,6 +1247,7 @@ with tab7:
     st.dataframe(display_df, use_container_width=True, hide_index=True)
     
     # Secțiune 4: Poziționare în Piață
+    st.markdown('<div id="pozitionare-piata"></div>', unsafe_allow_html=True)
     st.markdown("### 📈 Poziționare în Piață")
     
     col1, col2 = st.columns(2)
@@ -1198,6 +1273,7 @@ with tab7:
     st.success(f"💡 **{market_pos['positioning_note']}**")
     
     # Secțiune 5: Raza de Influență
+    st.markdown('<div id="raza-influenta"></div>', unsafe_allow_html=True)
     st.markdown("### 🗺️ Raza de Influență")
     
     col1, col2 = st.columns(2)
@@ -1233,6 +1309,7 @@ with tab7:
         st.plotly_chart(fig_zones, use_container_width=True)
     
     # Secțiune 6: Layout Comparativ (mp/om)
+    st.markdown('<div id="layout-comparativ"></div>', unsafe_allow_html=True)
     st.markdown("### 📐 Layout Comparativ (mp/om)")
     
     st.markdown("""
@@ -1311,6 +1388,7 @@ with tab7:
     """)
     
     # Secțiune 7: Layout Recomandat
+    st.markdown('<div id="layout-recomandat"></div>', unsafe_allow_html=True)
     st.markdown("### 🏗️ Layout Recomandat pentru Sala Noastră")
     
     layout_recommended = get_recommended_layout()
@@ -1356,6 +1434,7 @@ with tab7:
     """)
     
     # Secțiune 8: Simulare RedGym Nouă Locație
+    st.markdown('<div id="simulare-redgym"></div>', unsafe_allow_html=True)
     st.markdown("### 🔮 Simulare: Ce se întâmplă dacă RedGym deschide o nouă locație?")
     
     simulation = simulate_new_redgym_impact()
@@ -1401,6 +1480,7 @@ with tab7:
     st.warning(f"🔑 **Paradox:** {simulation['paradox']}")
     
     # Secțiune 9: Profitabilitate (Profit/abonat vs Profit/mp)
+    st.markdown('<div id="profitabilitate"></div>', unsafe_allow_html=True)
     st.markdown("### 💰 Profitabilitate: Profit/Abonat vs Profit/mp")
     
     st.markdown("""
@@ -1462,6 +1542,7 @@ with tab7:
             st.write(f"• {item}")
     
     st.markdown("---")
+    st.markdown('<div id="concluzie-strategica"></div>', unsafe_allow_html=True)
     st.markdown("""
     **Concluzie Strategică:**
     
@@ -1470,6 +1551,7 @@ with tab7:
     """)
     
     # Secțiune 11: Recomandări
+    st.markdown('<div id="recomandari"></div>', unsafe_allow_html=True)
     st.markdown("### 📌 Recomandări pentru Poziționarea Sălii")
     st.markdown("""
     **Locație țintă:** Strada Prieteniei nr 14, Bacău
