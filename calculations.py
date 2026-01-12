@@ -95,7 +95,41 @@ OCCUPANCY_SCENARIOS = {
 LOCATION = {
     'city': 'Bacau',
     'address': 'Aleea Prieteniei nr 14',
-    'coordinates': (46.5712, 26.9244)  # coordonate aproximative Bacau
+    'coordinates': (46.5685, 26.9100)  # Coordonate corecte pentru Aleea Prieteniei, Bacău
+}
+
+# Coordonate concurenți (din analiza concurențială)
+COMPETITOR_LOCATIONS = {
+    'redgym': {
+        'name': 'RedGym',
+        'coordinates': (46.5700, 26.9050),  # Aproximativ în zona centrală Bacău
+        'color': 'red',
+        'icon': 'dumbbell'
+    },
+    'citygym': {
+        'name': 'City Gym Arena Mall',
+        'coordinates': (46.5750, 26.9200),  # Zona mall/comercială
+        'color': 'blue',
+        'icon': 'shopping-cart'
+    },
+    'gymnastic_club': {
+        'name': 'Gymnastic Club',
+        'coordinates': (46.5650, 26.9000),  # Zona sud-vest
+        'color': 'orange',
+        'icon': 'star'
+    },
+    'pole_fitness': {
+        'name': 'Pole Fitness Bacau',
+        'coordinates': (46.5720, 26.9150),  # Zona centrală
+        'color': 'purple',
+        'icon': 'heart'
+    },
+    'q_fitt': {
+        'name': 'Q Fitt Bacau',
+        'coordinates': (46.5730, 26.9180),  # Zona centrală
+        'color': 'darkred',
+        'icon': 'fire'
+    }
 }
 
 DESIRED_MONTHLY_REVENUE = 50000  # RON

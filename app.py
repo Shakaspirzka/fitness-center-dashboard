@@ -17,7 +17,8 @@ from calculations import (
     DESIRED_MONTHLY_REVENUE,
     LOCATION,
     COMPETITORS,
-    CAPACITY_PER_HOUR
+    CAPACITY_PER_HOUR,
+    COMPETITOR_LOCATIONS
 )
 from competitor_analysis import (
     get_competitive_positioning,
@@ -498,13 +499,37 @@ with tab5:
         tiles='OpenStreetMap'
     )
     
-    # Adaugă marker pentru locația salii
+    # Adaugă marker pentru locația salii (marcat distinctiv cu verde)
     folium.Marker(
         [center_lat, center_lon],
-        popup=f"<b>💪 Sala Fitness & Recuperare</b><br>{LOCATION['address']}<br>{LOCATION['city']}",
-        tooltip="Locația Salii",
-        icon=folium.Icon(color='red', icon='info-sign')
+        popup=f"<b>💪 Sala Fitness & Recuperare</b><br>{LOCATION['address']}<br>{LOCATION['city']}<br><b>Poziționare:</b> Controlată, anti-aglomerație<br><b>Capacitate:</b> {CAPACITY_PER_HOUR} persoane/oră",
+        tooltip="Sala Noastră - Aleea Prieteniei nr 14",
+        icon=folium.Icon(color='green', icon='home')
     ).add_to(m)
+    
+    # Adaugă markeri pentru concurenți
+    for comp_key, comp_loc in COMPETITOR_LOCATIONS.items():
+        comp_lat, comp_lon = comp_loc['coordinates']
+        comp_name = comp_loc['name']
+        
+        # Obține informații despre concurent din COMPETITORS dacă există
+        comp_info = ""
+        if comp_key in COMPETITORS:
+            comp_data = COMPETITORS[comp_key]
+            comp_info = f"<br><b>Capacitate:</b> {comp_data['capacity_simultaneous']} persoane<br><b>Membri:</b> {comp_data['active_members']}<br><b>Model:</b> {comp_data['model']}"
+        elif comp_key == 'gymnastic_club':
+            comp_info = "<br><b>Tip:</b> Sală locală mică<br><b>Model:</b> Comunitate restrânsă"
+        elif comp_key == 'pole_fitness':
+            comp_info = "<br><b>Tip:</b> Specializată (Pole Fitness)<br><b>Model:</b> Nișă specifică"
+        elif comp_key == 'q_fitt':
+            comp_info = "<br><b>Tip:</b> Sală locală<br><b>Model:</b> Comunitate restrânsă"
+        
+        folium.Marker(
+            [comp_lat, comp_lon],
+            popup=f"<b>🏋️ {comp_name}</b>{comp_info}",
+            tooltip=f"Concurent: {comp_name}",
+            icon=folium.Icon(color=comp_loc['color'], icon='info-sign')
+        ).add_to(m)
     
     # Adaugă cercul de influență
     folium.Circle(
@@ -593,16 +618,20 @@ with tab5:
     # Adaugă legendă
     legend_html = '''
     <div style="position: fixed; 
-                bottom: 50px; right: 50px; width: 200px; height: 180px; 
+                bottom: 50px; right: 50px; width: 220px; height: 280px; 
                 background-color: white; border:2px solid grey; z-index:9999; 
-                font-size:14px; padding: 10px">
-    <h4 style="margin-top:0">Legendă Participare</h4>
-    <p><span style="color:green">●</span> Ridicată (>120%)</p>
-    <p><span style="color:blue">●</span> Medie (100%)</p>
-    <p><span style="color:orange">●</span> Moderată (80%)</p>
-    <p><span style="color:red">●</span> Redusă (<80%)</p>
-    <p><span style="color:red">📍</span> Sala Fitness</p>
-    <p><span style="color:#3186cc">○</span> Raza influență</p>
+                font-size:13px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2)">
+    <h4 style="margin-top:0; font-size:14px">Legendă</h4>
+    <p style="margin:5px 0"><b>Participare:</b></p>
+    <p style="margin:2px 0"><span style="color:green; font-size:16px">●</span> Ridicată (>120%)</p>
+    <p style="margin:2px 0"><span style="color:blue; font-size:16px">●</span> Medie (100%)</p>
+    <p style="margin:2px 0"><span style="color:orange; font-size:16px">●</span> Moderată (80%)</p>
+    <p style="margin:2px 0"><span style="color:red; font-size:16px">●</span> Redusă (<80%)</p>
+    <hr style="margin:8px 0">
+    <p style="margin:5px 0"><b>Locații:</b></p>
+    <p style="margin:2px 0"><span style="color:green; font-size:16px">🏠</span> Sala Noastră</p>
+    <p style="margin:2px 0"><span style="color:red; font-size:16px">🏋️</span> Concurenți</p>
+    <p style="margin:2px 0"><span style="color:#3186cc; font-size:16px">○</span> Raza influență</p>
     </div>
     '''
     m.get_root().html.add_child(folium.Element(legend_html))
