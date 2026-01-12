@@ -886,17 +886,80 @@ with tab5:
         # Salvează harta temporar și o afișează
         map_data = st_folium(m, width=1200, height=600, returned_objects=[])
     except Exception as e:
-        st.error(f"⚠️ Eroare la afișarea hărții: {str(e)}")
+        st.error(f"⚠️ Eroare la afișarea hărții Folium: {str(e)}")
         st.info("💡 **Soluții:**\n1. Verifică conexiunea la internet\n2. Reîmprospătează pagina (F5)\n3. Verifică dacă firewall-ul blochează conexiunea")
         
-        # Alternativă: afișează informații despre hartă
-        st.markdown("### Informații despre Hartă")
-        st.write(f"**Locație:** {LOCATION['address']}, {LOCATION['city']}")
-        st.write(f"**Coordonate:** {center_lat:.4f}, {center_lon:.4f}")
+        # Alternativă: Hărți Google Maps
+        st.markdown("---")
+        st.markdown("### 🗺️ Hărți Google Maps - Locații Săli")
+        
+        # Harta noastră
+        st.markdown("#### 📍 Sală Noastră")
+        gym_lat, gym_lon = LOCATION['coordinates']
+        google_maps_url = f"https://www.google.com/maps?q={gym_lat},{gym_lon}&z=15"
+        st.markdown(f"**Locație:** {LOCATION['address']}, {LOCATION['city']}")
+        st.markdown(f"**Coordonate:** {gym_lat:.4f}, {gym_lon:.4f}")
+        st.markdown(f"[🗺️ Deschide în Google Maps]({google_maps_url})")
+        
+        # Iframe cu Google Maps pentru sala noastră
+        st.markdown(f"""
+        <iframe 
+            width="100%" 
+            height="400" 
+            frameborder="0" 
+            style="border:0" 
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6M4kfWL7l0Q&q={gym_lat},{gym_lon}&zoom=15" 
+            allowfullscreen>
+        </iframe>
+        """, unsafe_allow_html=True)
+        
+        # Hărți pentru concurenți
+        st.markdown("#### 🏋️ Locații Concurenți")
+        for comp_key, comp_loc in COMPETITOR_LOCATIONS.items():
+            comp_lat, comp_lon = comp_loc['coordinates']
+            comp_name = comp_loc['name']
+            comp_url = f"https://www.google.com/maps?q={comp_lat},{comp_lon}&z=15"
+            
+            st.markdown(f"**{comp_name}**")
+            st.markdown(f"Coordonate: {comp_lat:.4f}, {comp_lon:.4f}")
+            st.markdown(f"[🗺️ Deschide în Google Maps]({comp_url})")
+            st.markdown("---")
+        
+        # Informații despre hartă
+        st.markdown("### Informații despre Analiză")
         st.write(f"**Raza de influență:** {radius_km:.2f} km")
         st.write(f"**Număr blocuri/cartiere:** {num_blocks}")
     
+    # Secțiune alternativă cu Google Maps
+    st.markdown("---")
+    st.markdown("## 🗺️ Hărți Google Maps - Locații Săli")
+    st.info("💡 **Alternativă:** Dacă harta interactivă de mai sus nu funcționează corect, poți folosi aceste link-uri Google Maps pentru a vedea locațiile exacte ale tuturor sălilor.")
+    
+    col_map1, col_map2 = st.columns(2)
+    
+    with col_map1:
+        st.markdown("### 📍 Sală Noastră")
+        gym_lat, gym_lon = LOCATION['coordinates']
+        google_maps_url = f"https://www.google.com/maps?q={gym_lat},{gym_lon}&z=15"
+        st.markdown(f"**Locație:** {LOCATION['address']}, {LOCATION['city']}")
+        st.markdown(f"**Coordonate:** {gym_lat:.4f}, {gym_lon:.4f}")
+        st.markdown(f"**Link:** [{google_maps_url}]({google_maps_url})")
+        st.markdown(f"[🗺️ **Deschide în Google Maps**]({google_maps_url})")
+    
+    with col_map2:
+        st.markdown("### 🏋️ Concurenți - Link-uri Google Maps")
+        for comp_key, comp_loc in COMPETITOR_LOCATIONS.items():
+            comp_lat, comp_lon = comp_loc['coordinates']
+            comp_name = comp_loc['name']
+            comp_url = f"https://www.google.com/maps?q={comp_lat},{comp_lon}&z=15"
+            
+            st.markdown(f"**{comp_name}**")
+            st.markdown(f"Coordonate: {comp_lat:.4f}, {comp_lon:.4f}")
+            st.markdown(f"[🗺️ Deschide în Google Maps]({comp_url})")
+            st.markdown("---")
+    
     # Tabel cu detalii blocuri
+    st.markdown("---")
     st.markdown("### Detalii Blocuri și Cartiere")
     
     blocks_df = pd.DataFrame(blocks_data)
