@@ -286,6 +286,13 @@ def calculate_campaign_scale(
     """
     Calculează dimensiunea necesară a unei campanii la nivel de cartier
     
+    Logica corectă:
+    1. Calculăm câți oameni trebuie atinși de campanie: total_clients_needed / conversion_rate
+    2. Acești oameni trebuie să fie din populația interesată
+    3. Calculăm câtă populație totală avem nevoie: people_to_reach / participation_rate
+    4. Calculăm suprafața necesară: total_population_needed / population_density
+    5. Calculăm raza necesară: sqrt(area_needed / π)
+    
     Args:
         total_clients_needed: Numărul total de clienți necesari
         participation_rate: Rata de participare a populației
@@ -295,18 +302,47 @@ def calculate_campaign_scale(
     Returns:
         Dict cu informații despre campanie
     """
-    radius = calculate_influence_radius(total_clients_needed, participation_rate, population_density)
+    if conversion_rate == 0 or participation_rate == 0 or population_density == 0:
+        return {
+            'radius_km': 0,
+            'area_km2': 0,
+            'total_population': 0,
+            'interested_population': 0,
+            'people_to_reach': 0,
+            'conversion_rate': conversion_rate
+        }
+    
+    # Pasul 1: Câți oameni trebuie atinși de campanie pentru a obține clienții necesari
+    people_to_reach = total_clients_needed / conversion_rate
+    
+    # Pasul 2: Acești oameni trebuie să fie din populația interesată
+    # Deci avem nevoie de atâția oameni interesați
+    interested_population_needed = people_to_reach
+    
+    # Pasul 3: Calculăm câtă populație totală avem nevoie
+    # pentru a avea suficienți oameni interesați
+    total_population_needed = interested_population_needed / participation_rate
+    
+    # Pasul 4: Calculăm suprafața necesară
+    area_needed = total_population_needed / population_density
+    
+    # Pasul 5: Calculăm raza necesară (presupunând zonă circulară)
+    radius = np.sqrt(area_needed / np.pi)
+    
+    # Acum calculăm valorile finale bazate pe raza corectă
     area = np.pi * radius ** 2
     total_population = area * population_density
     interested_population = total_population * participation_rate
-    target_population = total_clients_needed / conversion_rate if conversion_rate > 0 else 0
+    
+    # Populația de atins este minimul dintre ce avem nevoie și ce este disponibil
+    people_to_reach_actual = min(people_to_reach, interested_population)
     
     return {
         'radius_km': radius,
         'area_km2': area,
         'total_population': int(total_population),
         'interested_population': int(interested_population),
-        'target_population': int(target_population),
+        'people_to_reach': int(people_to_reach_actual),
         'conversion_rate': conversion_rate
     }
 
@@ -315,7 +351,8 @@ def get_scenario_analysis(
     scenario: str,
     subscription_distribution: Dict[str, float],
     participation_rate: float = 0.10,
-    population_density: float = 1000
+    population_density: float = 1000,
+    conversion_rate: float = 0.05
 ) -> Dict:
     """
     Obține analiza completă pentru un scenariu
@@ -325,6 +362,7 @@ def get_scenario_analysis(
         subscription_distribution: Distribuția abonamentelor
         participation_rate: Rata de participare (default 10%)
         population_density: Densitatea populației (default 1000 oameni/km²)
+        conversion_rate: Rata de conversie a campaniei (default 5%)
     
     Returns:
         Dict cu toate rezultatele analizei
@@ -340,11 +378,11 @@ def get_scenario_analysis(
     # Calculează clienți totali
     total_clients = sum(revenue_data['clients'].values())
     
-    # Calculează raza de influență
-    radius = calculate_influence_radius(total_clients, participation_rate, population_density)
+    # Calculează dimensiunea campaniei (care include raza corectă calculată cu conversie)
+    campaign_data = calculate_campaign_scale(total_clients, participation_rate, population_density, conversion_rate)
     
-    # Calculează dimensiunea campaniei
-    campaign_data = calculate_campaign_scale(total_clients, participation_rate, population_density)
+    # Folosim raza din campanie (care este calculată corect ținând cont de conversie)
+    radius = campaign_data['radius_km']
     
     return {
         'scenario': scenario_config['name'],
@@ -364,7 +402,8 @@ def get_scenario_analysis(
 def compare_scenarios(
     subscription_distribution: Dict[str, float],
     participation_rate: float = 0.10,
-    population_density: float = 1000
+    population_density: float = 1000,
+    conversion_rate: float = 0.05
 ) -> pd.DataFrame:
     """
     Compară toate scenariile și returnează un DataFrame
@@ -372,7 +411,7 @@ def compare_scenarios(
     results = []
     
     for scenario in ['reduced', 'medium', 'high']:
-        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density)
+        analysis = get_scenario_analysis(scenario, subscription_distribution, participation_rate, population_density, conversion_rate)
         results.append({
             'Scenariu': analysis['scenario'],
             'Ocupare': analysis['occupancy_percentage'],
@@ -380,7 +419,7 @@ def compare_scenarios(
             'Clienți Totali': analysis['total_clients'],
             'Raza Influență (km)': round(analysis['influence_radius_km'], 2),
             'Populație Totală': analysis['campaign']['total_population'],
-            'Populație Țintă': analysis['campaign']['target_population']
+            'Populație de Atins': analysis['campaign']['people_to_reach']
         })
     
     return pd.DataFrame(results)

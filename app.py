@@ -158,23 +158,14 @@ conversion_rate = st.sidebar.slider(
     1, 20, 5, 1
 ) / 100
 
-# Calculează analiza pentru scenariul selectat
+# Calculează analiza pentru scenariul selectat (inclusiv campania cu conversie)
 analysis = get_scenario_analysis(
     selected_scenario,
     subscription_distribution,
     participation_rate,
-    population_density
-)
-
-# Ajustare pentru conversie în calculul campaniei
-from calculations import calculate_campaign_scale
-campaign_data = calculate_campaign_scale(
-    analysis['total_clients'],
-    participation_rate,
     population_density,
     conversion_rate
 )
-analysis['campaign'] = campaign_data
 
 # Main content
 col1, col2, col3, col4 = st.columns(4)
@@ -625,7 +616,8 @@ with tab4:
     comparison_df = compare_scenarios(
         subscription_distribution,
         participation_rate,
-        population_density
+        population_density,
+        conversion_rate
     )
     
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
@@ -997,9 +989,9 @@ with tab6:
     
     with col1:
         st.metric(
-            "Populație Țintă",
-            f"{campaign['target_population']:,}",
-            help="Populația care trebuie atinsă de campanie"
+            "Populație de Atins",
+            f"{campaign['people_to_reach']:,}",
+            help="Populația care trebuie atinsă de campanie (din cei interesați)"
         )
     
     with col2:
@@ -1031,8 +1023,8 @@ with tab6:
         st.info(f"""
         **Dimensiune Campanie:**
         - Populație totală în zonă: **{campaign['total_population']:,}** oameni
-        - Populație interesată: **{campaign['interested_population']:,}** oameni
-        - Populație țintă (pentru conversie): **{campaign['target_population']:,}** oameni
+        - Populație potențial interesată: **{campaign['interested_population']:,}** oameni
+        - Populație de atins prin campanie: **{campaign['people_to_reach']:,}** oameni
         
         **Acoperire Geografică:**
         - Raza: **{campaign['radius_km']:.2f} km**
@@ -1045,13 +1037,13 @@ with tab6:
             'Etapă': [
                 'Populație Totală',
                 'Populație Interesată',
-                'Populație Țintă',
+                'Populație de Atins',
                 'Clienți Finali'
             ],
             'Număr': [
                 campaign['total_population'],
                 campaign['interested_population'],
-                campaign['target_population'],
+                campaign['people_to_reach'],
                 analysis['total_clients']
             ]
         })
@@ -1085,13 +1077,203 @@ with tab6:
         help="Costul estimat pentru a atinge o persoană prin campanie"
     )
     
-    estimated_campaign_cost = campaign['target_population'] * cost_per_person
+    estimated_campaign_cost = campaign['people_to_reach'] * cost_per_person
     
     st.metric(
         "Cost Total Estimativ Campanie",
         f"{estimated_campaign_cost:,.0f} RON",
-        help="Costul estimat pentru a atinge populația țintă"
+        help="Costul estimat pentru a atinge populația necesară"
     )
+    
+    # Secțiune Sondaj
+    st.markdown("---")
+    st.markdown("### 📋 Sondaj în Cartier")
+    
+    st.markdown("""
+    **De ce este necesar un sondaj?**
+    
+    Un sondaj în cartier vă permite să:
+    - **Înțelegeți nevoile reale** ale potențialilor clienți din zonă
+    - **Identificați preferințele** pentru program, servicii și prețuri
+    - **Măsurați interesul** pentru diferite tipuri de abonamente
+    - **Creați o bază de date** cu contacte pentru campanii viitoare
+    - **Construiți relații** cu comunitatea locală înainte de deschidere
+    
+    **Când să realizați sondajul:**
+    - Înainte de finalizarea planului de afaceri
+    - În timpul pregătirii spațiului
+    - Ca parte a campaniei de pre-lansare
+    """)
+    
+    # Întrebări predefinite pentru sondaj
+    st.markdown("#### Exemple de întrebări pentru sondaj")
+    
+    default_questions = [
+        "Vârsta dumneavoastră?",
+        "Locuiți în acest cartier?",
+        "Aveți experiență cu săli de fitness?",
+        "Ce tip de antrenament preferați? (forță, cardio, funcțional, recuperare)",
+        "Ce oră a zilei preferați pentru antrenament?",
+        "Cât ați fi dispus să plătiți pentru un abonament lunar?",
+        "Ce servicii suplimentare vă interesează? (antrenor personal, nutriție, masaj)",
+        "Cât de important este pentru dumneavoastră să aveți spațiu suficient și să nu stați la coadă?",
+        "Ați fi interesat de o aplicație pentru rezervarea timpului de antrenament?",
+        "Cum ați auzit despre noi? (recomandare, social media, flyer, altceva)"
+    ]
+    
+    # Session state pentru întrebări
+    if 'survey_questions' not in st.session_state:
+        st.session_state.survey_questions = default_questions.copy()
+    
+    # Editor pentru întrebări
+    st.markdown("#### ✏️ Editează întrebările pentru sondaj")
+    
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        st.info("💡 Puteți adăuga, edita sau șterge întrebări pentru a personaliza sondajul pentru cartierul dumneavoastră.")
+    
+    with col2:
+        if st.button("🔄 Resetare la întrebări predefinite"):
+            st.session_state.survey_questions = default_questions.copy()
+            st.rerun()
+    
+    # Lista de întrebări editabile
+    new_questions = []
+    # Asigură-te că session_state este inițializat
+    survey_questions = st.session_state.get('survey_questions', default_questions.copy())
+    for i, question in enumerate(survey_questions):
+        col1, col2 = st.columns([10, 1])
+        with col1:
+            edited_question = st.text_input(
+                f"Întrebare {i+1}",
+                value=question,
+                key=f"question_{i}",
+                label_visibility="collapsed"
+            )
+            if edited_question:
+                new_questions.append(edited_question)
+        with col2:
+            if st.button("🗑️", key=f"delete_{i}", help="Șterge întrebarea"):
+                if 'survey_questions' in st.session_state:
+                    st.session_state.survey_questions.pop(i)
+                st.rerun()
+    
+    # Actualizează lista dacă s-au făcut modificări
+    if len(new_questions) == len(survey_questions):
+        st.session_state.survey_questions = new_questions
+    
+    # Adaugă întrebare nouă
+    st.markdown("#### ➕ Adaugă întrebare nouă")
+    new_question = st.text_input(
+        "Scrieți o întrebare nouă:",
+        key="new_question_input",
+        placeholder="Ex: Cât de des ați folosi sala? (zile pe săptămână)"
+    )
+    
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        if st.button("➕ Adaugă", key="add_question"):
+            if new_question and new_question.strip():
+                st.session_state.survey_questions.append(new_question.strip())
+                st.rerun()
+    
+    # Afișează întrebările finale
+    final_questions = st.session_state.get('survey_questions', default_questions.copy())
+    if final_questions:
+        st.markdown("#### 📝 Lista finală de întrebări")
+        st.markdown("**Total întrebări:** " + str(len(final_questions)))
+        for i, q in enumerate(final_questions, 1):
+            st.markdown(f"{i}. {q}")
+    
+    # Secțiune Concurs
+    st.markdown("---")
+    st.markdown("### 🏆 Concurs de Cartier")
+    
+    st.markdown("""
+    **De ce un concurs de cartier?**
+    
+    Un concurs de cartier este o modalitate excelentă de:
+    - **Creștere a vizibilității** brandului în comunitate
+    - **Atragere a atenției** asupra deschiderii sălii
+    - **Construire a relațiilor** cu locuitorii din zonă
+    - **Generare de conținut** pentru social media
+    - **Creare a unui sentiment de comunitate** în jurul sălii
+    
+    **Tipuri de concursuri recomandate:**
+    """)
+    
+    st.markdown("""
+    #### 🏃 Ture de Cartier (Semi-Maraton)
+    - **Format:** Cursă pe distanțe variate (5km, 10km)
+    - **Categorii pe vârstă:** 
+      - Juniori (12-17 ani)
+      - Tineri (18-35 ani)
+      - Seniori (36-50 ani)
+      - Veterani (50+ ani)
+    - **Premii:** Abonamente gratuite (1, 3, 6 luni), trofee, produse locale
+    - **Beneficii:** Vizibilitate maximă, participare masivă, conținut pentru social media
+    
+    #### ⚡ Sprinturi
+    - **Format:** Competiții de viteză pe distanțe scurte (50m, 100m)
+    - **Categorii pe vârstă:** Similar cu turele
+    - **Premii:** Abonamente, produse sportive, vouchere
+    - **Beneficii:** Accesibil pentru toate vârstele, distractiv, rapid
+    
+    #### 💪 Concurs de Forță
+    - **Format:** Competiții pe categorii:
+      - Deadlift (ridicare greutate)
+      - Bench press (presă pe bancă)
+      - Squat (genuflexiuni cu greutate)
+    - **Categorii pe vârstă și greutate:**
+      - Tineri (18-35): Lightweight, Middleweight, Heavyweight
+      - Seniori (36-50): Lightweight, Middleweight, Heavyweight
+      - Veterani (50+): Open category
+    - **Premii:** Abonamente premium, echipament sportiv, trofee personalizate
+    - **Beneficii:** Atrage entuziaștii fitness, demonstrează echipamentul sălii
+    
+    #### 🎯 Structură Recomandată pentru Premii
+    """)
+    
+    prize_structure = pd.DataFrame({
+        'Poziție': ['Locul 1', 'Locul 2', 'Locul 3', 'Locurile 4-10'],
+        'Premiu': [
+            'Abonament 6 luni + trofeu + produse locale',
+            'Abonament 3 luni + medalie + produse locale',
+            'Abonament 1 lună + medalie + produse locale',
+            'Abonament 1 lună sau produse locale'
+        ],
+        'Valoare Estimată (RON)': ['~3000', '~1500', '~500', '~200-500']
+    })
+    
+    st.dataframe(prize_structure, use_container_width=True, hide_index=True)
+    
+    st.markdown("""
+    #### 💰 Estimare Costuri Concurs
+    
+    **Costuri potențiale:**
+    - Organizare și logistică: 2,000 - 5,000 RON
+    - Premii (abonamente, trofee, produse): 5,000 - 10,000 RON
+    - Marketing și promovare: 1,000 - 3,000 RON
+    - Permise/autorizații (dacă e necesar): 500 - 2,000 RON
+    - **Total estimat:** 8,500 - 20,000 RON
+    
+    **ROI potențial:**
+    - Vizibilitate în comunitate: **Fără preț**
+    - Baza de date cu participanți: **200-500 contacte**
+    - Abonamente generate direct: **20-50 abonamente noi**
+    - Conținut social media: **Săptămâni de postări**
+    """)
+    
+    st.markdown("""
+    #### 📅 Calendar Recomandat
+    
+    1. **2-3 luni înainte de deschidere:** Anunț concurs
+    2. **1-2 luni înainte:** Început înscrieri, campanie promoțională
+    3. **2-3 săptămâni înainte:** Finalizare înscrieri, pregătiri finale
+    4. **1 săptămână înainte de deschidere:** Desfășurare concurs
+    5. **Ziua deschiderii:** Ceremonie de premiere, tururi ghidate ale sălii
+    """)
 
 with tab7:
     st.subheader("🏆 Analiză Concurențială & Poziționare Strategică")
