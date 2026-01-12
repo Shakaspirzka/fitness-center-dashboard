@@ -215,7 +215,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "🗺️ Hartă Participare",
     "🎯 Campanie",
     "🏆 Analiză Concurențială",
-    "📘 Model de Gândire"
+    "📘 Model de Gândire și Arhitectură Dashboard"
 ])
 
 with tab1:
