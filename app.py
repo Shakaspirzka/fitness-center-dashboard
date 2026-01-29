@@ -1631,6 +1631,27 @@ with tab7:
         for item in positioning['what_we_dont_do']:
             st.write(f"• {item}")
     
+    # Public țintă (dacă există în positioning)
+    if 'target_audience' in positioning:
+        st.markdown("#### 🎯 Public Țintă - Entry-Point pentru Mișcare")
+        st.success("""
+        **Mobilis Vita se adresează:**
+        """)
+        for audience in positioning['target_audience']:
+            st.write(f"• {audience}")
+    
+    # Prioritatea serviciilor (dacă există)
+    if 'services_priority' in positioning:
+        st.markdown("#### 📋 Prioritatea Serviciilor")
+        services_priority = positioning['services_priority']
+        st.info(f"""
+        **Serviciu Principal:** {services_priority.get('primary', 'N/A')}
+        
+        **Servicii Secundare:** {services_priority.get('secondary', 'N/A')}
+        
+        **Serviciu Terțiar:** {services_priority.get('tertiary', 'N/A')}
+        """)
+    
     # Secțiune 2: Capacitate Optimă
     st.markdown('<div id="capacitate-optima"></div>', unsafe_allow_html=True)
     st.markdown("### 📊 Capacitate Optimă")
@@ -1767,16 +1788,37 @@ with tab7:
     - **12+ mp/om** → Premium / Control
     """)
     
-    # Input pentru suprafața noastră
-    our_area_m2 = st.number_input(
-        "Suprafața Sălii Noastre (mp)",
-        min_value=300,
-        max_value=500,
-        value=400,
-        step=10,
-        help="Suprafața totală a sălii (350-450 mp recomandat)",
-        key="our_area_m2"
-    )
+    # Input pentru suprafața noastră - Mobilis Vita
+    st.info("""
+    **Mobilis Vita - Structură Spațiu:**
+    - **Sala de Fitness:** 65-70 mp (serviciu secundar)
+    - **Sala de Clase:** 50 mp (serviciu principal)
+    - **Total:** ~115-120 mp
+    """)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        fitness_area = st.number_input(
+            "Sala de Fitness (mp)",
+            min_value=60,
+            max_value=75,
+            value=67,
+            step=1,
+            help="Sala de fitness: 65-70 mp (serviciu secundar)",
+            key="fitness_area_m2"
+        )
+    with col2:
+        classes_area = st.number_input(
+            "Sala de Clase (mp)",
+            min_value=45,
+            max_value=55,
+            value=50,
+            step=1,
+            help="Sala de clase de mișcare: 50 mp (serviciu principal)",
+            key="classes_area_m2"
+        )
+    
+    our_area_m2 = fitness_area + classes_area
     
     layout_comparison = get_layout_comparison(our_area_m2, CAPACITY_PER_HOUR)
     layout_df = pd.DataFrame(layout_comparison)
@@ -2200,112 +2242,165 @@ with tab7:
     
     # Secțiune 11: Recomandări
     st.markdown('<div id="recomandari"></div>', unsafe_allow_html=True)
-    st.markdown("### 📌 Recomandări pentru Poziționarea Sălii")
+    st.markdown("### 📌 Recomandări pentru Poziționarea Mobilis Vita")
     st.markdown("""
     **Locație țintă:** Strada Prieteniei nr 14, Bacău
     
-    Iată recomandări concrete pentru a-ți poziționa sala și a-ți diferenția oferta față de concurență:
+    **Model:** Entry-point pentru mișcare, family-friendly, nu pentru pasionați de fitness
+    
+    Iată recomandări concrete bazate pe feedback-ul clientului:
     """)
     
-    # 1. Capacitate și spațiu
-    st.markdown("#### 🎯 1. Capacitate și spațiu")
-    st.markdown("""
-    Dacă țintești **~60% din capacitatea unei locații mari** (ca 18GYM) → **~100–180 utilizatori simultan**.
+    # 1. Poziționare strategică corectă
+    st.markdown("#### 🎯 1. Poziționare Strategică Corectă")
+    st.warning("""
+    **EROARE CORECTATĂ:** Poziționarea inițială era greșită!
     
-    **Spațiu estimat de ~250–400 m²** poate fi suficient pentru această capacitate cu o configurație eficientă.
+    **NU ne adresăm:**
+    - ❌ Pasionaților de fitness
+    - ❌ Celor cu experiență avansată
+    - ❌ Persoanelor care caută performanță
     
-    💡 **Recomandare:** Menține raportul **8-11 mp/utilizator** pentru a garanta confortul și a diferenția experiența față de sălile de volum.
+    **DA, ne adresăm:**
+    - ✅ Oamenilor care încep mișcarea (de la 0)
+    - ✅ Oamenilor care revin la mișcare după pauză
+    - ✅ Familiilor cu copii (family-friendly)
+    - ✅ Mămici care caută activități pentru ele și copii
+    - ✅ Bunici care doresc mișcare blândă
+    - ✅ Persoanelor care nu se simt confortabile în săli tradiționale
     """)
     
-    # 2. Structura serviciilor
-    st.markdown("#### 💡 2. Structura serviciilor")
+    # 2. Capacitate și spațiu
+    st.markdown("#### 📐 2. Capacitate și spațiu - Dimensiuni Reale")
     st.markdown("""
-    **Abonamente flexibile:**
-    - 1 lună, 3 luni, anual
-    - Opțiuni pentru studenți / corporate
-    - Pachete scurte (săptămână / 2 săptămâni): ~80–140 lei
+    **Structură reală a spațiului:**
+    - **Sala de Fitness:** 65-70 mp (serviciu secundar)
+    - **Sala de Clase:** 50 mp (serviciu principal)
+    - **Total:** ~115-120 mp
     
-    **Servicii auxiliare:**
-    - Antrenor personal
-    - Cursuri de grup
-    - Nutriție
-    - Programe clare pentru obiective
-    - Servicii de recuperare și reeducare funcțională
+    **Capacitate simultană:**
+    - **Sala fitness:** 8-12 persoane (pentru confort și abordare personalizată)
+    - **Sala clase:** 8-15 persoane (pentru clase de mișcare)
+    - **Total simultan:** 10-15 persoane (pentru a menține confortul psihic pentru începători)
     
-    **Program extins:**
-    - 05:00–23:00 sau non-stop cu acces controlat pentru a concura cu City Gym
-    - Acces controlat prin aplicație de booking
+    💡 **Recomandare:** Menține raportul **9-12 mp/utilizator** pentru a garanta spațiul sigur, fără presiune, ideal pentru entry-point.
     """)
     
-    # 3. Prețuri orientative de piață
-    st.markdown("#### 💰 3. Prețuri orientative de piață")
+    # 3. Structura serviciilor (prioritizată)
+    st.markdown("#### 💡 3. Structura Serviciilor - Prioritate Corectă")
     st.markdown("""
-    - **Abonament lunar standard:** ~160–230 lei (pentru acces complet)
-    - **Abonament student:** ~130–180 lei
-    - **Pachete scurte (săptămână / 2 săptămâni):** ~80–140 lei
-    - **Premium / Recovery:** ~400–600 lei
-    - **PT / Reabilitare:** ~100–150 lei/sesiune
+    **SERVICIU PRINCIPAL: Clase de Mișcare (50 mp)**
+    - Clase de mișcare pentru începători
+    - Clase family-friendly (copii, mămici, bunici)
+    - Clase de integrare mișcare în viață pentru sănătate
+    - Abordare fără judecăți, ghidare de la 0
+    
+    **SERVICII SECUNDARE:**
+    - **Masaj:** 100 RON/sesiune - relaxare și wellness
+    - **Kineto/Reabilitare:** 120 RON/sesiune - recuperare medicală
+    
+    **SERVICIU TERȚIAR: Acces Sala Fitness (65-70 mp)**
+    - Acces la echipamente fitness (serviciu secundar)
+    - Nu este focus-ul principal
+    - Pentru cei care doresc să completeze clasele cu fitness
+    
+    **Abonamente:**
+    - **Clase de Mișcare:** 180 RON/lună (serviciu principal)
+    - **Acces Sala Fitness:** 120 RON/lună (serviciu secundar)
+    - **Abonament Complet:** 250 RON/lună (clase + fitness)
+    - **Abonament Family:** 400 RON/lună (pentru 2-3 persoane)
     """)
     
-    # 4. Target
-    st.markdown("#### 📍 4. Target")
+    # 4. Prețuri orientative de piață
+    st.markdown("#### 💰 4. Prețuri Orientative de Piață")
     st.markdown("""
-    - **Studenți și tineri profesioniști** – abonamente accesibile, flexibilitate mare
-    - **Persoane cu program încărcat** – acces 05:00–24:00 sau 24/7
-    - **Fitness casual / hobby** – clase conduse și planuri de antrenament ușor de urmat
-    - **Persoane cu nevoi de recuperare** – servicii specializate PT/Reabilitare
+    **Abonamente:**
+    - **Clase de Mișcare:** 180 RON/lună (serviciu principal)
+    - **Acces Sala Fitness:** 120 RON/lună (serviciu secundar)
+    - **Abonament Complet:** 250 RON/lună
+    - **Abonament Family:** 400 RON/lună (2-3 persoane)
+    
+    **Servicii per sesiune:**
+    - **Masaj:** 100 RON/sesiune
+    - **Kineto/Reabilitare:** 120 RON/sesiune
     """)
     
-    # 5. Aplicație de Booking
-    st.markdown("#### 📱 5. Aplicație de Booking – Garantarea Spațiului Sufficient")
+    # 5. Target corect
+    st.markdown("#### 📍 5. Target Corect - Entry-Point")
     st.markdown("""
-    **De ce este esențială o aplicație de booking?**
+    **Public țintă principal:**
+    - **Oameni care încep mișcarea (de la 0)** – entry-point, fără judecăți
+    - **Oameni care revin la mișcare după pauză** – ghidare și suport
+    - **Familii cu copii** – family-friendly, activități pentru toată familia
+    - **Mămici** – activități pentru ele și copii
+    - **Bunici** – mișcare blândă, adaptată vârstei
+    - **Persoane care nu se simt confortabile în săli tradiționale** – spațiu sigur
     
-    Pentru a-ți diferenția sala și a garanta clienților că vor avea **spațiu suficient** pentru a-și desfășura programul de antrenament, 
-    este crucial să dezvolți o **aplicație de booking** care să:
-    
-    ✅ **Garantează disponibilitatea** – Clienții văd în timp real disponibilitatea între anumite intervale orare
-    
-    ✅ **Arată tipurile de aparate disponibile** – Fiecare client poate rezerva accesul la tipurile de echipamente de care are nevoie
-    
-    ✅ **Previne aglomerația** – Sistemul limitează automat numărul de rezervări per interval orar, asigurând raportul optim mp/utilizator
-    
-    ✅ **Creează încredere** – Clienții știu că nu vor ajunge la sală și să găsească toate aparatele ocupate
-    
-    ✅ **Diferențiere competitivă** – Niciun competitor din zonă nu oferă acest nivel de control și predictibilitate
-    
-    **Funcționalități recomandate pentru aplicație:**
-    
-    - **Rezervare pe intervale orare** (ex: 08:00-09:00, 09:00-10:00, etc.)
-    - **Vizualizare disponibilitate pe tipuri de aparate** (cardio, forță, funcțional, etc.)
-    - **Limitare automată a numărului de rezervări** per interval (bazat pe capacitatea optimă)
-    - **Notificări înainte de rezervare** pentru a-ți confirma prezența
-    - **Sistem de așteptare** pentru intervalele populare
-    - **Istoric rezervări** și statistici personale
-    - **Integrare cu sistemul de abonamente** – doar membrii activi pot rezerva
-    
-    **Impact asupra modelului de business:**
-    
-    - **Retenție crescută** – Clienții apreciază predictibilitatea și confortul
-    - **Diferențiere clară** – "Nu stai la coadă" devine o promisiune verificabilă, nu doar marketing
-    - **Optimizare capacitate** – Poți distribui mai eficient utilizatorii pe toată ziua
-    - **Date valoroase** – Înțelegi pattern-urile de utilizare și poți optimiza programul și echipamentele
+    **Mesaj cheie:** "Nu te simți judecat, ci ghidat să integrezi mișcarea în viață pentru sănătate"
     """)
     
-    # Concluzie rapidă
-    st.markdown("#### 📌 Concluzie Rapidă")
+    # 6. Aplicație de Booking - Adaptată pentru Model Entry-Point
+    st.markdown("#### 📱 6. Aplicație de Booking – Garantarea Spațiului și Confortului Psihic")
     st.markdown("""
-    👉 **Piața din Bacău este destul de diversificată:** de la săli mari și bine echipate până la studiouri locale mici.
+    **De ce este esențială o aplicație de booking pentru modelul entry-point?**
     
-    👉 **Pentru un plan de afaceri, propunerea de valoare ar trebui să combine:**
-    - Preț competitiv
-    - Program flexibil
-    - Servicii personalizate
-    - **Control al capacității prin aplicație de booking** (diferențiator cheie)
+    Pentru modelul **Mobilis Vita** (entry-point, family-friendly), aplicația de booking este **chiar mai importantă** decât pentru sălile tradiționale:
     
-    👉 **Analizează fluxul real de clienți** (ore de vârf, zone dense) pentru a dimensiona corect capacitatea și abonamentele.
+    ✅ **Garantează spațiu sigur** – Clienții (începători) văd că nu vor fi surprinși de aglomerație (intimidant pentru entry-point)
     
-    👉 **Aplicația de booking nu este doar un tool tehnologic, ci o componentă esențială a modelului de business** care transformă promisiunea "fără aglomerație" într-o realitate măsurabilă și verificabilă.
+    ✅ **Rezervare clase de mișcare** – Clienții pot rezerva locuri la clase (serviciul principal), garantând accesul
+    
+    ✅ **Rezervare sala fitness** – Pentru cei care doresc să completeze cu fitness (serviciu secundar)
+    
+    ✅ **Rezervare masaj/kineto** – Pentru serviciile terapeutice
+    
+    ✅ **Family-friendly** – Părinții pot rezerva pentru ei și copii simultan
+    
+    ✅ **Previne aglomerația psihică** – Pentru începători, aglomerația este mai intimidantă decât pentru pasionați
+    
+    ✅ **Creează încredere** – Clienții știu că vor avea spațiu și nu se vor simți judecați sau stânjeniți
+    
+    **Funcționalități recomandate pentru aplicație (model entry-point):**
+    
+    - **Rezervare clase de mișcare** (serviciu principal) – programul săptămânal de clase
+    - **Rezervare sala fitness** (serviciu secundar) – pe intervale orare, limitat la 8-12 persoane
+    - **Rezervare masaj/kineto** – programare directă cu terapeuți
+    - **Rezervare family** – părinți pot rezerva pentru ei și copii
+    - **Vizualizare disponibilitate în timp real** – câți oameni sunt deja în sală/clasă
+    - **Limitare automată** – sistemul previne aglomerația (critic pentru entry-point)
+    - **Notificări prietenoase** – amintiri blânde, nu presiuni
+    - **Istoric progres** – pentru începători, să vadă progresul (motivație)
+    - **Integrare abonamente** – doar membrii activi pot rezerva
+    
+    **Impact asupra modelului de business (entry-point):**
+    
+    - **Retenție foarte crescută** – Începătorii apreciază predictibilitatea și siguranța spațiului
+    - **Diferențiere clară** – "Spațiu sigur, fără judecăți" devine verificabil
+    - **Comfort psihic** – Reduce anxietatea pentru începători (critic pentru entry-point)
+    - **Family-friendly** – Facilitează participarea familiilor
+    - **Optimizare capacitate** – Distribuie utilizatorii pentru a menține confortul psihic
+    """)
+    
+    # Concluzie rapidă - Actualizată
+    st.markdown("#### 📌 Concluzie Rapidă - Mobilis Vita")
+    st.markdown("""
+    👉 **Piața din Bacău este foarte diversificată:** de la săli mari de fitness până la centre specializate pe terapii.
+    
+    👉 **Mobilis Vita ocupă un gol clar de piață:**
+    - **Entry-point pentru mișcare** – nu pentru pasionați, ci pentru începători
+    - **Family-friendly** – copii, mămici, bunici bineveniți
+    - **Fără judecăți** – oamenii vin pentru că nu se simt judecați, ci ghidați
+    - **Clase de mișcare ca serviciu principal** (50 mp)
+    - **Fitness ca serviciu secundar** (65-70 mp)
+    - **Servicii terapeutice:** masaj, kineto
+    
+    👉 **Propunerea de valoare:**
+    - "Spațiu sigur pentru a începe sau reveni la mișcare"
+    - "Fără judecăți, cu ghidare de la 0"
+    - "Family-friendly: pentru toată familia"
+    - "Integrare mișcare în viață pentru sănătate"
+    
+    👉 **Aplicația de booking este esențială** pentru a garanta confortul psihic al începătorilor și a diferenția modelul entry-point.
     """)
 
 # Tab 8: Scopul și Arhitectura Dashboard
@@ -2413,39 +2508,50 @@ with tab8:
     st.markdown("""
     #### C. Dimensionarea Spațiului – Indicatorul mp / Utilizator
     
-    În fitness, confortul perceput nu este determinat de suprafața totală a sălii, ci de raportul dintre suprafață și numărul de utilizatori simultan. 
-    Acest indicator măsoară experiența fizică și diferențiază modelul controlat de sălile de volum.
+    **Mobilis Vita - Model Entry-Point pentru Mișcare:**
+    
+    Spațiul este structurat în două zone principale:
+    - **Sala de Clase de Mișcare:** 50 mp (SERVICIU PRINCIPAL)
+    - **Sala de Fitness:** 65-70 mp (serviciu secundar)
+    - **Total:** ~115-120 mp
+    
+    **Model de Business:**
+    - **NU** pentru pasionați de fitness sau cei cu experiență avansată
+    - **DA** pentru oameni care încep sau revin la mișcare (entry-point)
+    - **Family-friendly:** copii, mămici, bunici bineveniți
+    - **Fără judecăți:** oamenii vin pentru că nu se simt judecați, ci ghidați
+    - **Integrare mișcare în viață:** pentru sănătate, nu pentru performanță
     
     **Ipoteze concrete:**
-    - Suprafață totală: 400 mp (interval recomandat: 350-450 mp)
-    - Utilizatori simultan: 50 persoane (interval țintă: 40-60 persoane)
-    - Calcul: 400 mp / 50 utilizatori = **8 mp/utilizator**
+    - Suprafață totală: ~117.5 mp (67.5 mp fitness + 50 mp clase)
+    - Utilizatori simultan: 10-15 persoane (interval țintă pentru confort)
+    - Calcul: 117.5 mp / 12 utilizatori = **~9.8 mp/utilizator**
     
     **Formula de calcul:**
     ```
     mp/utilizator = Suprafață totală (mp) / Număr utilizatori simultan
     ```
     
-    **Praguri de interpretare:**
-    - **Sub 6 mp/utilizator**: Aglomerație percepută, experiență negativă
-    - **6-8 mp/utilizator**: Acceptabil, dar la limita confortului
-    - **8-11 mp/utilizator**: Confort optim, experiență premium (interval țintă)
-    - **Peste 11 mp/utilizator**: Spațiu generos, dar potențial subutilizat
+    **Praguri de interpretare pentru modelul entry-point:**
+    - **Sub 6 mp/utilizator**: Prea aglomerat pentru entry-point (intimidant)
+    - **6-9 mp/utilizator**: Acceptabil pentru începători (confort psihic)
+    - **9-12 mp/utilizator**: Ideal pentru entry-point (spațiu sigur, fără presiune)
+    - **Peste 12 mp/utilizator**: Spațiu generos, dar potențial subutilizat
     
-    **Legătura cu ocuparea țintă (55-65%):**
-    - La ocupare 55-65%, cu 50 utilizatori simultan, raportul mp/utilizator rămâne în intervalul 8-11 mp
-    - Ocupare peste 70% reduce raportul sub 8 mp/utilizator, afectând confortul
-    - Ocupare sub 50% crește raportul peste 11 mp/utilizator, indicând subutilizare
+    **Legătura cu ocuparea țintă (60-70%):**
+    - La ocupare 60-70%, cu 10-12 utilizatori simultan, raportul mp/utilizator rămâne în intervalul 9-12 mp
+    - Ocupare peste 80% reduce raportul sub 9 mp/utilizator, afectând confortul psihic (intimidant pentru începători)
+    - Ocupare sub 50% crește raportul peste 12 mp/utilizator, indicând subutilizare
     
-    **Impact asupra retenției clienților:**
-    - Raport sub 6 mp/utilizator: Risc crescut de abandon (clienții percep aglomerația)
-    - Raport 8-11 mp/utilizator: Retenție optimă (confort perceput, fără senzație de aglomerație)
-    - Raport peste 11 mp/utilizator: Retenție bună, dar eficiență economică redusă
+    **Impact asupra retenției clienților (model entry-point):**
+    - Raport sub 6 mp/utilizator: Risc foarte crescut de abandon (intimidant pentru începători)
+    - Raport 9-12 mp/utilizator: Retenție optimă (spațiu sigur, fără presiune, confort psihic)
+    - Raport peste 12 mp/utilizator: Retenție bună, dar eficiență economică redusă
     
-    **Diferențierea față de sălile de volum:**
-    - Săli mari (RedGym, CityGym): 4-6 mp/utilizator la orele de vârf
-    - Sala noastră (model controlat): 8-11 mp/utilizator constant
-    - Avantaj competitiv: "Nu stai la coadă" vs "Avem aparate noi"
+    **Diferențierea față de sălile tradiționale:**
+    - Săli mari (RedGym, CityGym): 4-6 mp/utilizator, focus pe pasionați de fitness
+    - Mobilis Vita (model entry-point): 9-12 mp/utilizator, focus pe începători și familii
+    - Avantaj competitiv: "Spațiu sigur, fără judecăți" vs "Avem aparate noi"
     """)
     
     st.markdown("---")

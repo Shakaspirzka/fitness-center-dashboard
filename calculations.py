@@ -6,38 +6,61 @@ import pandas as pd
 from typing import Dict, Tuple
 
 
-# Configurație spațiu
-CAPACITY_PER_HOUR = 20  # oameni/ora
+# Configurație spațiu - Mobilis Vita
+# Sala de fitness: 65-70 mp
+# Sala de clase: 50 mp
+# Total: ~115-120 mp
+FITNESS_AREA_M2 = 67.5  # medie între 65-70 mp
+CLASSES_AREA_M2 = 50
+TOTAL_AREA_M2 = FITNESS_AREA_M2 + CLASSES_AREA_M2  # ~117.5 mp
+
+# Capacitate ajustată pentru spațiu mai mic și model entry-point, family-friendly
+# Nu pentru pasionați de fitness, ci pentru oameni care încep sau revin la mișcare
+CAPACITY_PER_HOUR = 12  # oameni/ora (redus pentru confort și abordare personalizată)
 HOURS_PER_DAY = 10
 DAYS_PER_WEEK = 7
 WEEKS_PER_MONTH = 4.33  # medie
 
-# Abonamente - Structură extinsă conform analizei concurențiale
+# Abonamente - Mobilis Vita: Entry-point pentru mișcare, family-friendly
+# Model: Nu pentru pasionați de fitness, ci pentru oameni care încep sau revin la mișcare
 SUBSCRIPTION_TYPES = {
-    'basic': {
-        'name': 'Basic Controlat',
-        'price': 140,  # RON/lună (130-150 RON)
-        'sessions': None,  # nelimitat dar controlat
-        'description': 'Atragere public local, acces controlat'
+    'clase_miscare': {
+        'name': 'Clase de Mișcare',
+        'price': 180,  # RON/lună - serviciul principal
+        'sessions': None,  # nelimitat la clase
+        'description': 'Acces nelimitat la clase de mișcare (entry-point principal)'
     },
-    'standard': {
-        'name': 'Standard',
-        'price': 200,  # RON/lună (180-220 RON)
+    'fitness_access': {
+        'name': 'Acces Sala Fitness',
+        'price': 120,  # RON/lună - serviciu secundar
+        'sessions': None,  # nelimitat dar spațiu limitat
+        'description': 'Acces la sala de fitness (65-70mp), serviciu secundar'
+    },
+    'complet': {
+        'name': 'Abonament Complet',
+        'price': 250,  # RON/lună - clase + fitness
         'sessions': None,  # nelimitat
-        'description': 'Bază financiară, acces complet'
+        'description': 'Acces complet: clase de mișcare + sala fitness'
     },
-    'premium': {
-        'name': 'Premium / Recovery',
-        'price': 500,  # RON/lună (400-600 RON)
-        'sessions': None,  # nelimitat cu servicii speciale
-        'description': 'Diferențiator, servicii de recuperare'
+    'family': {
+        'name': 'Abonament Family',
+        'price': 400,  # RON/lună - pentru 2-3 persoane (copii, părinți, bunici)
+        'sessions': None,  # nelimitat pentru toată familia
+        'description': 'Family-friendly: pentru copii, mămici, bunici'
     },
-    'pt_session': {
-        'name': 'PT / Reabilitare (per sesiune)',
-        'price': 125,  # RON/sesiune (100-150 RON)
+    'masaj': {
+        'name': 'Masaj (per sesiune)',
+        'price': 100,  # RON/sesiune
         'sessions': 1,  # per sesiune
-        'description': 'Marjă ridicată, servicii personalizate',
-        'is_session_based': True  # se plătește per sesiune, nu lunar
+        'description': 'Masaj de relaxare sau terapeutic',
+        'is_session_based': True
+    },
+    'kineto': {
+        'name': 'Kineto / Reabilitare (per sesiune)',
+        'price': 120,  # RON/sesiune
+        'sessions': 1,  # per sesiune
+        'description': 'Kinetoterapie și reabilitare',
+        'is_session_based': True
     }
 }
 

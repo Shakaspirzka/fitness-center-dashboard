@@ -75,18 +75,55 @@ COMPETITOR_DETAILS = {
     }
 }
 
-# Layout recomandat pentru sala noastră
+# Layout recomandat pentru Mobilis Vita
+# Sala de fitness: 65-70mp, Sala de clase: 50mp
 OUR_RECOMMENDED_LAYOUT = {
-    'total_area_m2': 400,  # 350-450 mp
+    'total_area_m2': 117.5,  # 67.5mp fitness + 50mp clase
+    'fitness_area_m2': 67.5,  # Sala de fitness
+    'classes_area_m2': 50,  # Sala de clase
     'distribution': {
-        'forță_funcțional': {'percentage': 57.5, 'm2': 230, 'description': 'Forță / Funcțional'},
-        'cardio': {'percentage': 15, 'm2': 60, 'description': 'Cardio'},
-        'recuperare': {'percentage': 10, 'm2': 40, 'description': 'Recuperare / Stretching / Postural'},
-        'circulații': {'percentage': 10, 'm2': 40, 'description': 'Circulații (FOARTE IMPORTANT)'},
-        'vestiare_depozit': {'percentage': 7.5, 'm2': 30, 'description': 'Vestiare / Depozit'}
+        'sala_clase': {
+            'percentage': 42.5, 
+            'm2': 50, 
+            'description': 'Sala de Clase de Mișcare (SERVICIU PRINCIPAL)',
+            'priority': 'primary'
+        },
+        'fitness_echipamente': {
+            'percentage': 30, 
+            'm2': 35, 
+            'description': 'Echipamente Fitness (Cardio + Forță ușoară)',
+            'priority': 'secondary'
+        },
+        'spatiu_funcțional': {
+            'percentage': 17, 
+            'm2': 20, 
+            'description': 'Spațiu Funcțional / Stretching',
+            'priority': 'secondary'
+        },
+        'masaj_kineto': {
+            'percentage': 8.5, 
+            'm2': 10, 
+            'description': 'Cabinet Masaj / Kineto',
+            'priority': 'secondary'
+        },
+        'circulații_vestiare': {
+            'percentage': 12.5, 
+            'm2': 12.5, 
+            'description': 'Circulații / Vestiare / Depozit',
+            'priority': 'infrastructure'
+        }
     },
-    'target_capacity': {'min': 40, 'max': 60, 'optimal': 50},
-    'm2_per_person_range': {'min': 8, 'max': 11, 'optimal': 8.5}
+    'target_capacity': {
+        'fitness_simultaneous': {'min': 8, 'max': 12, 'optimal': 10},
+        'classes_simultaneous': {'min': 8, 'max': 15, 'optimal': 12},
+        'total_simultaneous': {'min': 10, 'max': 15, 'optimal': 12}
+    },
+    'm2_per_person_range': {
+        'fitness': {'min': 5.5, 'max': 8.5, 'optimal': 6.75},
+        'classes': {'min': 3.3, 'max': 6.25, 'optimal': 4.2},
+        'overall': {'min': 7.8, 'max': 11.75, 'optimal': 9.8}
+    },
+    'model_description': 'Entry-point pentru mișcare, family-friendly, focus pe clase'
 }
 
 # Praguri de confort mp/om
@@ -554,7 +591,8 @@ EXTENDED_COMPETITOR_DATA = {
 
 def get_competitive_positioning() -> dict:
     """
-    Returnează analiza poziționării competitive
+    Returnează analiza poziționării competitive - Mobilis Vita
+    Model: Entry-point pentru mișcare, family-friendly, nu pentru pasionați de fitness
     """
     our_capacity = CAPACITY_PER_HOUR
     our_max_monthly = calculate_max_capacity()
@@ -562,32 +600,48 @@ def get_competitive_positioning() -> dict:
     return {
         'our_capacity_simultaneous': our_capacity,
         'our_max_monthly_slots': our_max_monthly,
-        'positioning': 'Sală controlată, fără haos, orientată spre rezultate reale',
+        'positioning': 'Entry-point pentru mișcare: spațiu sigur, fără judecăți, pentru oameni care încep sau revin la mișcare',
         'key_advantages': [
-            'Dimensiune medie optimă',
-            'Poziționare mid-premium',
-            'Control strict al capacității',
-            'Experiență calmă și predictibilă',
-            'Relație personală',
-            'Servicii de recuperare și postural',
+            'Family-friendly: copii, mămici, bunici bineveniți',
+            'Entry-point: nu te simți judecat, ci ghidat de la 0 sau puțină mișcare',
+            'Abordare personalizată și suportivă',
+            'Clase de mișcare ca serviciu principal',
+            'Spațiu mic dar confortabil (65-70mp fitness + 50mp clase)',
+            'Integrare mișcare în viață pentru sănătate',
+            'Servicii complete: clase, masaj, kineto, fitness (secundar)',
             'Proximitate (acces pietonal)'
         ],
         'what_we_dont_do': [
-            'Nu concurează pe preț minim',
-            'Nu concurează pe suprafață',
-            'Nu concurează pe număr de aparate',
-            'Nu folosește modelul 24/7 orientat exclusiv pe volum'
+            'NU ne adresăm pasionaților de fitness',
+            'NU ne adresăm celor cu experiență avansată',
+            'NU concurează pe volum sau preț minim',
+            'NU este o sală tradițională de fitness',
+            'NU folosește modelul competitiv sau intensiv'
+        ],
+        'target_audience': [
+            'Oameni care încep mișcarea (de la 0)',
+            'Oameni care revin la mișcare după pauză',
+            'Familii cu copii',
+            'Mămici care caută activități pentru ele și copii',
+            'Bunici care doresc mișcare blândă',
+            'Persoane care nu se simt confortabile în săli tradiționale',
+            'Oameni care caută integrare mișcare în viață pentru sănătate'
         ],
         'optimal_capacity': {
-            'simultaneous': '40-60 persoane',
+            'simultaneous': '10-15 persoane (spațiu mic dar confortabil)',
             'launch_occupancy': '30-40%',
-            'mature_occupancy': '55-65%',
-            'warning_threshold': '70% (depășirea afectează experiența)'
+            'mature_occupancy': '60-70%',
+            'warning_threshold': '80% (spațiu mic, trebuie menținut confortul)'
         },
         'influence_radius': {
-            'estimated': '~1 km',
-            'primary_zone': '60% din clienți din primii 500-700m',
-            'secondary_zone': '40% prin recomandări și retenție'
+            'estimated': '~500-700m (comunitate locală)',
+            'primary_zone': '70% din clienți din primii 500m (family-friendly, acces ușor)',
+            'secondary_zone': '30% prin recomandări și comunitate'
+        },
+        'services_priority': {
+            'primary': 'Clase de mișcare (50mp dedicat)',
+            'secondary': 'Masaj și kineto (servicii terapeutice)',
+            'tertiary': 'Acces sala fitness (65-70mp, serviciu secundar)'
         }
     }
 
