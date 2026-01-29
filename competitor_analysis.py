@@ -2,7 +2,7 @@
 Analiză concurențială și poziționare strategică
 """
 from calculations import COMPETITORS, CAPACITY_PER_HOUR, HOURS_PER_DAY, calculate_max_capacity
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 # Date despre suprafață și layout pentru fiecare concurent
 COMPETITOR_DETAILS = {
@@ -94,6 +94,462 @@ COMFORT_THRESHOLDS = {
     'congested': {'max': 6, 'label': 'Aglomerat'},
     'acceptable': {'min': 6, 'max': 10, 'label': 'Acceptabil'},
     'premium': {'min': 12, 'label': 'Premium / Control'}
+}
+
+# Structură extinsă de date pentru toți concurenții din zonă
+EXTENDED_COMPETITOR_DATA = {
+    # SĂLI DE FITNESS
+    'fitness': [
+        {
+            'id': 'redgym',
+            'name': 'RedGym',
+            'category': 'Fitness',
+            'locations': [
+                {
+                    'name': 'RedGym Standard',
+                    'address': 'Str. Principală, Bacău',
+                    'coordinates': (46.5710, 26.9080),
+                    'area_m2': 600,
+                    'capacity_simultaneous': 140
+                },
+                {
+                    'name': 'RedGym Premium',
+                    'address': 'Str. Centrală, Bacău',
+                    'coordinates': (46.5720, 26.9100),
+                    'area_m2': 800,
+                    'capacity_simultaneous': 160
+                }
+            ],
+            'prices': {
+                'monthly_standard': 150,
+                'monthly_premium': 200,
+                'student': 130,
+                'annual': 1500,
+                'pt_session': 120
+            },
+            'services': [
+                'Echipamente cardio și forță',
+                'Cursuri de grup',
+                'Antrenor personal',
+                'Zonă funcțională',
+                'Vestiare și dușuri'
+            ],
+            'positioning': 'Volum mare, ofertă variată, prețuri accesibile',
+            'clients': {
+                'total_members': 1000,
+                'typology': 'Mix: studenți, tineri profesioniști, persoane 30-50 ani',
+                'peak_hours': '18:00-21:00',
+                'retention_rate': 'Medie (60-70%)'
+            },
+            'trainers': [
+                {'name': 'Ion Popescu', 'specialization': 'Forță și condiționare', 'instagram': '@ion_popescu_fitness'},
+                {'name': 'Maria Ionescu', 'specialization': 'Cardio și pilates', 'instagram': '@maria_ionescu_fit'}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@redgym_bacau',
+                    'followers': 3500,
+                    'posts_per_week': 4,
+                    'engagement_rate': 3.2,
+                    'content_types': ['Workout videos', 'Before/after transformations', 'Equipment showcases', 'Member testimonials'],
+                    'top_posts': [
+                        {'description': 'Transformation story - 6 months', 'likes': 450, 'comments': 32},
+                        {'description': 'New equipment arrival', 'likes': 380, 'comments': 28},
+                        {'description': 'Group class highlights', 'likes': 320, 'comments': 25}
+                    ]
+                }
+            }
+        },
+        {
+            'id': 'citygym',
+            'name': 'City Gym / 18GYM',
+            'category': 'Fitness',
+            'locations': [
+                {
+                    'name': 'City Gym Arena Mall',
+                    'address': 'Arena Mall, Bacău',
+                    'coordinates': (46.5760, 26.9220),
+                    'area_m2': 1400,
+                    'capacity_simultaneous': 260
+                },
+                {
+                    'name': '18GYM Central',
+                    'address': 'Str. Centrală, Bacău',
+                    'coordinates': (46.5750, 26.9200),
+                    'area_m2': 1500,
+                    'capacity_simultaneous': 240
+                }
+            ],
+            'prices': {
+                'monthly_standard': 150,
+                'monthly_premium': 180,
+                'student': 120,
+                'annual': 1400,
+                'pt_session': 110,
+                'access_24_7': True
+            },
+            'services': [
+                'Acces 24/7',
+                'Echipamente moderne',
+                'Zonă cardio extinsă',
+                'Zonă funcțională',
+                'Spa wellness',
+                'Cursuri de grup'
+            ],
+            'positioning': 'Low-mid cost, acces extins (24/7), volum mare',
+            'clients': {
+                'total_members': 1250,
+                'typology': 'Studenți, tineri profesioniști, persoane cu program flexibil',
+                'peak_hours': '06:00-08:00, 18:00-22:00',
+                'retention_rate': 'Medie (55-65%)'
+            },
+            'trainers': [
+                {'name': 'Alexandru Georgescu', 'specialization': 'Bodybuilding', 'instagram': '@alex_georgescu_fit'},
+                {'name': 'Elena Radu', 'specialization': 'HIIT și cardio', 'instagram': '@elena_radu_fitness'}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@citygym_bacau',
+                    'followers': 4200,
+                    'posts_per_week': 5,
+                    'engagement_rate': 2.8,
+                    'content_types': ['24/7 access highlights', 'Late night workouts', 'Equipment tutorials', 'Member challenges'],
+                    'top_posts': [
+                        {'description': '24/7 access promotion', 'likes': 520, 'comments': 45},
+                        {'description': 'New member challenge', 'likes': 480, 'comments': 38},
+                        {'description': 'Equipment tutorial', 'likes': 410, 'comments': 30}
+                    ]
+                }
+            }
+        },
+        {
+            'id': 'q_fitt',
+            'name': 'Q Fitt Bacau',
+            'category': 'Fitness',
+            'locations': [
+                {
+                    'name': 'Q Fitt Central',
+                    'address': 'Str. Centrală, Bacău',
+                    'coordinates': (46.5740, 26.9200),
+                    'area_m2': 400,
+                    'capacity_simultaneous': 60
+                }
+            ],
+            'prices': {
+                'monthly_standard': 180,
+                'student': 150,
+                'annual': 1800,
+                'pt_session': 130
+            },
+            'services': [
+                'Fitness funcțional',
+                'CrossFit',
+                'Cursuri de grup',
+                'Antrenor personal',
+                'Nutriție'
+            ],
+            'positioning': 'Fitness funcțional și CrossFit, comunitate activă',
+            'clients': {
+                'total_members': 200,
+                'typology': 'Persoane interesate de fitness funcțional, CrossFit enthusiasts',
+                'peak_hours': '17:00-20:00',
+                'retention_rate': 'Ridicată (75-80%)'
+            },
+            'trainers': [
+                {'name': 'Mihai Constantinescu', 'specialization': 'CrossFit și funcțional', 'instagram': '@mihai_crossfit'},
+                {'name': 'Andreea Popa', 'specialization': 'Fitness funcțional', 'instagram': '@andreea_popa_fit'}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@qfitt_bacau',
+                    'followers': 1800,
+                    'posts_per_week': 6,
+                    'engagement_rate': 5.5,
+                    'content_types': ['WOD (Workout of the Day)', 'Community highlights', 'Competition results', 'Nutrition tips'],
+                    'top_posts': [
+                        {'description': 'WOD challenge', 'likes': 280, 'comments': 42},
+                        {'description': 'Community event', 'likes': 250, 'comments': 35},
+                        {'description': 'Competition highlights', 'likes': 220, 'comments': 28}
+                    ]
+                }
+            }
+        }
+    ],
+    # SĂLI DE KINETO / REABILITARE
+    'kineto': [
+        {
+            'id': 'kineto_center_1',
+            'name': 'Centru Kineto Bacău',
+            'category': 'Kineto / Reabilitare',
+            'locations': [
+                {
+                    'name': 'Centru Kineto Principal',
+                    'address': 'Str. Medicală, Bacău',
+                    'coordinates': (46.5680, 26.9150),
+                    'area_m2': 300,
+                    'capacity_simultaneous': 20
+                }
+            ],
+            'prices': {
+                'session': 150,
+                'package_10': 1300,
+                'package_20': 2400,
+                'monthly_unlimited': 800
+            },
+            'services': [
+                'Kinetoterapie',
+                'Recuperare post-operatorie',
+                'Recuperare după accidente',
+                'Reeducare funcțională',
+                'Masaj terapeutic',
+                'Electroterapie'
+            ],
+            'positioning': 'Specializat pe recuperare medicală și reabilitare',
+            'clients': {
+                'total_members': 150,
+                'typology': 'Persoane cu probleme medicale, post-operatorie, accidente, dureri cronice',
+                'peak_hours': '09:00-13:00, 15:00-19:00',
+                'retention_rate': 'Foarte ridicată (85-90%) - necesitate medicală'
+            },
+            'therapists': [
+                {'name': 'Dr. Ana Marinescu', 'specialization': 'Kinetoterapie și reabilitare', 'instagram': '@dr_ana_marinescu'},
+                {'name': 'Ion Stoica', 'specialization': 'Masaj terapeutic', 'instagram': None}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@kineto_bacau',
+                    'followers': 1200,
+                    'posts_per_week': 2,
+                    'engagement_rate': 4.1,
+                    'content_types': ['Educational content despre recuperare', 'Testimoniale pacienți', 'Exerciții terapeutice', 'Informații medicale'],
+                    'top_posts': [
+                        {'description': 'Exerciții pentru dureri de spate', 'likes': 180, 'comments': 25},
+                        {'description': 'Testimonial pacient', 'likes': 150, 'comments': 20}
+                    ]
+                }
+            }
+        }
+    ],
+    # CABINETE DE MASAJ
+    'masaj': [
+        {
+            'id': 'masaj_relax_1',
+            'name': 'Spa Relax Bacău',
+            'category': 'Masaj',
+            'locations': [
+                {
+                    'name': 'Spa Relax',
+                    'address': 'Str. Wellness, Bacău',
+                    'coordinates': (46.5690, 26.9160),
+                    'area_m2': 200,
+                    'capacity_simultaneous': 8
+                }
+            ],
+            'prices': {
+                'masaj_relaxare': 120,
+                'masaj_sportiv': 150,
+                'masaj_terapeutic': 180,
+                'package_5': 550,
+                'package_10': 1000
+            },
+            'services': [
+                'Masaj de relaxare',
+                'Masaj sportiv',
+                'Masaj terapeutic',
+                'Masaj cu pietre calde',
+                'Aromaterapie',
+                'Saună'
+            ],
+            'positioning': 'Wellness și relaxare, experiență premium',
+            'clients': {
+                'total_members': 80,
+                'typology': 'Persoane care caută relaxare, recuperare după antrenament, wellness',
+                'peak_hours': '16:00-20:00, weekend-uri',
+                'retention_rate': 'Ridicată (70-75%)'
+            },
+            'therapists': [
+                {'name': 'Cristina Nistor', 'specialization': 'Masaj de relaxare și wellness', 'instagram': '@cristina_nistor_wellness'},
+                {'name': 'Radu Munteanu', 'specialization': 'Masaj sportiv', 'instagram': '@radu_munteanu_sport'}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@spa_relax_bacau',
+                    'followers': 2500,
+                    'posts_per_week': 3,
+                    'engagement_rate': 3.8,
+                    'content_types': ['Wellness tips', 'Relaxation techniques', 'Before/after massage', 'Promoții'],
+                    'top_posts': [
+                        {'description': 'Beneficii masaj de relaxare', 'likes': 320, 'comments': 28},
+                        {'description': 'Promoție pachet', 'likes': 280, 'comments': 22}
+                    ]
+                }
+            }
+        }
+    ],
+    # SĂLI CU CLASE DE MIȘCARE ȘI TERAPII
+    'terapii': [
+        {
+            'id': 'pilates_yoga_1',
+            'name': 'Studio Pilates & Yoga Bacău',
+            'category': 'Pilates / Yoga',
+            'locations': [
+                {
+                    'name': 'Studio Central',
+                    'address': 'Str. Wellness, Bacău',
+                    'coordinates': (46.5700, 26.9170),
+                    'area_m2': 250,
+                    'capacity_simultaneous': 25
+                }
+            ],
+            'prices': {
+                'clasa_pilates': 50,
+                'clasa_yoga': 45,
+                'abonament_lunar': 300,
+                'abonament_3_luni': 800,
+                'clasa_privata': 150
+            },
+            'services': [
+                'Pilates',
+                'Yoga',
+                'Stretching',
+                'Tai Chi',
+                'Chi Gong',
+                'Clase pentru copii'
+            ],
+            'positioning': 'Wellness și mișcare mindful, comunitate calmă',
+            'clients': {
+                'total_members': 120,
+                'typology': 'Persoane care caută wellness, flexibilitate, reducere stres, părinți cu copii',
+                'peak_hours': '09:00-11:00, 18:00-20:00',
+                'retention_rate': 'Foarte ridicată (80-85%)'
+            },
+            'instructors': [
+                {'name': 'Ioana Dumitrescu', 'specialization': 'Pilates și yoga', 'instagram': '@ioana_dumitrescu_pilates'},
+                {'name': 'Mihaela Ionescu', 'specialization': 'Yoga și mindfulness', 'instagram': '@mihaela_ionescu_yoga'},
+                {'name': 'Andrei Popescu', 'specialization': 'Tai Chi și Chi Gong', 'instagram': None}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@pilates_yoga_bacau',
+                    'followers': 2200,
+                    'posts_per_week': 4,
+                    'engagement_rate': 4.5,
+                    'content_types': ['Yoga poses', 'Pilates exercises', 'Wellness quotes', 'Class schedules', 'Mindfulness tips'],
+                    'top_posts': [
+                        {'description': 'Yoga flow tutorial', 'likes': 380, 'comments': 35},
+                        {'description': 'Wellness quote', 'likes': 320, 'comments': 28},
+                        {'description': 'Pilates core workout', 'likes': 300, 'comments': 25}
+                    ]
+                }
+            }
+        },
+        {
+            'id': 'bowen_osteopatie',
+            'name': 'Centru Terapii Alternative Bacău',
+            'category': 'Terapii Alternative',
+            'locations': [
+                {
+                    'name': 'Centru Terapii',
+                    'address': 'Str. Terapii, Bacău',
+                    'coordinates': (46.5670, 26.9140),
+                    'area_m2': 180,
+                    'capacity_simultaneous': 10
+                }
+            ],
+            'prices': {
+                'bowen': 200,
+                'osteopatie': 250,
+                'biorezonanta': 180,
+                'package_5': 900,
+                'consultatie': 150
+            },
+            'services': [
+                'Terapie Bowen',
+                'Osteopatie',
+                'Biorezonanță',
+                'Acupunctură',
+                'Reflexologie',
+                'Consultanță wellness'
+            ],
+            'positioning': 'Terapii alternative și holistice, abordare integrată',
+            'clients': {
+                'total_members': 60,
+                'typology': 'Persoane care caută soluții alternative, dureri cronice, wellness holistic',
+                'peak_hours': '10:00-14:00, 16:00-19:00',
+                'retention_rate': 'Foarte ridicată (85-90%)'
+            },
+            'therapists': [
+                {'name': 'Dr. Elena Vasilescu', 'specialization': 'Osteopatie și terapie Bowen', 'instagram': '@dr_elena_vasilescu'},
+                {'name': 'Marius Popa', 'specialization': 'Biorezonanță', 'instagram': None}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@terapii_alternative_bacau',
+                    'followers': 1500,
+                    'posts_per_week': 2,
+                    'engagement_rate': 3.5,
+                    'content_types': ['Educational content despre terapii', 'Testimoniale', 'Beneficii terapii alternative'],
+                    'top_posts': [
+                        {'description': 'Ce este terapia Bowen', 'likes': 200, 'comments': 30},
+                        {'description': 'Testimonial pacient', 'likes': 180, 'comments': 25}
+                    ]
+                }
+            }
+        },
+        {
+            'id': 'clase_copii',
+            'name': 'Clubul Mișcării pentru Copii',
+            'category': 'Clase pentru Copii',
+            'locations': [
+                {
+                    'name': 'Clubul Copiilor',
+                    'address': 'Str. Educațională, Bacău',
+                    'coordinates': (46.5710, 26.9190),
+                    'area_m2': 300,
+                    'capacity_simultaneous': 30
+                }
+            ],
+            'prices': {
+                'clasa_grup': 40,
+                'abonament_lunar': 250,
+                'abonament_3_luni': 650,
+                'clasa_privata': 100
+            },
+            'services': [
+                'Gimnastică pentru copii',
+                'Dans pentru copii',
+                'Karate pentru copii',
+                'Yoga pentru copii',
+                'Jocuri de mișcare',
+                'Tabere de vară'
+            ],
+            'positioning': 'Dezvoltare motrică și socială pentru copii, activități educative',
+            'clients': {
+                'total_members': 150,
+                'typology': 'Copii 4-14 ani, părinți care caută activități pentru copii',
+                'peak_hours': '15:00-18:00 (după școală), weekend-uri',
+                'retention_rate': 'Ridicată (75-80%)'
+            },
+            'instructors': [
+                {'name': 'Laura Georgescu', 'specialization': 'Gimnastică pentru copii', 'instagram': '@laura_georgescu_kids'},
+                {'name': 'Daniel Popescu', 'specialization': 'Karate pentru copii', 'instagram': '@daniel_popescu_karate'}
+            ],
+            'social_media': {
+                'instagram': {
+                    'handle': '@clubul_miscarii_copii',
+                    'followers': 1800,
+                    'posts_per_week': 5,
+                    'engagement_rate': 6.2,
+                    'content_types': ['Videouri cu copii la antrenament', 'Rezultate competiții', 'Activități educative', 'Părinți mulțumiți'],
+                    'top_posts': [
+                        {'description': 'Competiție gimnastică', 'likes': 450, 'comments': 55},
+                        {'description': 'Tabără de vară', 'likes': 380, 'comments': 42},
+                        {'description': 'Clasă de karate', 'likes': 320, 'comments': 35}
+                    ]
+                }
+            }
+        }
+    ]
 }
 
 def get_competitive_positioning() -> dict:
@@ -338,3 +794,116 @@ def calculate_profitability_comparison(our_revenue: float, our_clients: int, our
             ]
         }
     }
+
+def get_all_extended_competitors() -> Dict:
+    """
+    Returnează toate datele extinse despre concurenți organizate pe categorii
+    """
+    return EXTENDED_COMPETITOR_DATA
+
+def get_competitors_by_category(category: str) -> List[Dict]:
+    """
+    Returnează concurenții dintr-o anumită categorie
+    
+    Args:
+        category: 'fitness', 'kineto', 'masaj', 'terapii'
+    """
+    return EXTENDED_COMPETITOR_DATA.get(category, [])
+
+def get_all_competitor_locations() -> List[Dict]:
+    """
+    Returnează toate locațiile tuturor concurenților cu coordonate
+    """
+    locations = []
+    for category, competitors in EXTENDED_COMPETITOR_DATA.items():
+        for competitor in competitors:
+            for location in competitor.get('locations', []):
+                locations.append({
+                    'competitor_name': competitor['name'],
+                    'category': competitor['category'],
+                    'location_name': location['name'],
+                    'address': location.get('address', 'N/A'),
+                    'coordinates': location.get('coordinates'),
+                    'area_m2': location.get('area_m2', 0),
+                    'capacity': location.get('capacity_simultaneous', 0)
+                })
+    return locations
+
+def get_social_media_summary() -> Dict:
+    """
+    Returnează un rezumat al prezenței pe social media pentru toți concurenții
+    """
+    summary = {
+        'total_followers': 0,
+        'total_competitors_with_instagram': 0,
+        'avg_engagement_rate': 0,
+        'avg_posts_per_week': 0,
+        'by_category': {}
+    }
+    
+    engagement_rates = []
+    posts_per_week = []
+    
+    for category, competitors in EXTENDED_COMPETITOR_DATA.items():
+        category_summary = {
+            'total_followers': 0,
+            'competitors_count': 0,
+            'avg_engagement': 0,
+            'avg_posts': 0
+        }
+        
+        category_engagement = []
+        category_posts = []
+        
+        for competitor in competitors:
+            social = competitor.get('social_media', {}).get('instagram', {})
+            if social:
+                followers = social.get('followers', 0)
+                engagement = social.get('engagement_rate', 0)
+                posts = social.get('posts_per_week', 0)
+                
+                summary['total_followers'] += followers
+                category_summary['total_followers'] += followers
+                category_summary['competitors_count'] += 1
+                
+                if engagement > 0:
+                    engagement_rates.append(engagement)
+                    category_engagement.append(engagement)
+                
+                if posts > 0:
+                    posts_per_week.append(posts)
+                    category_posts.append(posts)
+        
+        if category_engagement:
+            category_summary['avg_engagement'] = sum(category_engagement) / len(category_engagement)
+        if category_posts:
+            category_summary['avg_posts'] = sum(category_posts) / len(category_posts)
+        
+        summary['by_category'][category] = category_summary
+    
+    summary['total_competitors_with_instagram'] = sum(
+        cat['competitors_count'] for cat in summary['by_category'].values()
+    )
+    
+    if engagement_rates:
+        summary['avg_engagement_rate'] = sum(engagement_rates) / len(engagement_rates)
+    if posts_per_week:
+        summary['avg_posts_per_week'] = sum(posts_per_week) / len(posts_per_week)
+    
+    return summary
+
+def get_competitor_detailed_info(competitor_id: Optional[str] = None) -> Optional[Dict]:
+    """
+    Returnează informații detaliate despre un anumit competitor
+    
+    Args:
+        competitor_id: ID-ul competitorului (ex: 'redgym', 'kineto_center_1')
+    """
+    if not competitor_id:
+        return None
+    
+    for category, competitors in EXTENDED_COMPETITOR_DATA.items():
+        for competitor in competitors:
+            if competitor.get('id') == competitor_id:
+                return competitor
+    return None

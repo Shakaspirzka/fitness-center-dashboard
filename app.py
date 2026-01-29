@@ -30,7 +30,12 @@ from competitor_analysis import (
     get_recommended_layout,
     simulate_new_redgym_impact,
     calculate_profitability_comparison,
-    COMFORT_THRESHOLDS
+    COMFORT_THRESHOLDS,
+    get_all_extended_competitors,
+    get_competitors_by_category,
+    get_all_competitor_locations,
+    get_social_media_summary,
+    get_competitor_detailed_info
 )
 
 # Configurare pagină
@@ -1583,8 +1588,10 @@ with tab7:
         <li><a href="#layout-recomandat">🏗️ 7. Layout Recomandat</a></li>
         <li><a href="#simulare-redgym">🔮 8. Simulare RedGym Nouă Locație</a></li>
         <li><a href="#profitabilitate">💰 9. Profitabilitate</a></li>
-        <li><a href="#concluzie-strategica">📋 10. Concluzie Strategică</a></li>
-        <li><a href="#recomandari">📌 11. Recomandări pentru Poziționare</a></li>
+        <li><a href="#analiza-completa-concurenti">🔍 10. Analiză Completă Concurenți</a></li>
+        <li><a href="#analiza-social-media">📱 11. Analiză Social Media</a></li>
+        <li><a href="#concluzie-strategica">📋 12. Concluzie Strategică</a></li>
+        <li><a href="#recomandari">📌 13. Recomandări pentru Poziționare</a></li>
     </ul>
     </div>
     <script>
@@ -1980,12 +1987,215 @@ with tab7:
             st.write(f"• {item}")
     
     st.markdown("---")
+    
+    # Secțiune 10: Analiză Completă Concurenți
+    st.markdown('<div id="analiza-completa-concurenti"></div>', unsafe_allow_html=True)
+    st.markdown("### 🔍 Analiză Completă Concurenți - Piața din Bacău")
+    
+    st.markdown("""
+    Această secțiune oferă o analiză detaliată a tuturor concurenților din zonă, organizați pe categorii:
+    - **Săli de Fitness** - Săli tradiționale de fitness și bodybuilding
+    - **Săli de Kineto / Reabilitare** - Centre specializate pe recuperare medicală
+    - **Cabinete de Masaj** - Servicii de wellness și relaxare
+    - **Săli cu Clase de Mișcare și Terapii** - Pilates, yoga, terapii alternative, clase pentru copii
+    """)
+    
+    # Selector de categorie
+    all_competitors_data = get_all_extended_competitors()
+    category_names = {
+        'fitness': '🏋️ Săli de Fitness',
+        'kineto': '🏥 Săli de Kineto / Reabilitare',
+        'masaj': '💆 Cabinete de Masaj',
+        'terapii': '🧘 Clase de Mișcare și Terapii'
+    }
+    
+    selected_category = st.selectbox(
+        "Selectează categoria pentru analiză detaliată:",
+        options=list(category_names.keys()),
+        format_func=lambda x: category_names[x],
+        key="competitor_category_selector"
+    )
+    
+    competitors_in_category = get_competitors_by_category(selected_category)
+    
+    if competitors_in_category:
+        st.markdown(f"#### {category_names[selected_category]}")
+        
+        for idx, competitor in enumerate(competitors_in_category):
+            with st.expander(f"**{competitor['name']}** - {competitor.get('positioning', 'N/A')}", expanded=(idx == 0)):
+                # Locații
+                st.markdown("##### 📍 Locații")
+                locations_df = pd.DataFrame([
+                    {
+                        'Nume Locație': loc['name'],
+                        'Adresă': loc.get('address', 'N/A'),
+                        'Suprafață (mp)': loc.get('area_m2', 0),
+                        'Capacitate Simultană': loc.get('capacity_simultaneous', 0)
+                    }
+                    for loc in competitor.get('locations', [])
+                ])
+                st.dataframe(locations_df, use_container_width=True, hide_index=True)
+                
+                # Prețuri
+                st.markdown("##### 💰 Prețuri Practicate")
+                prices = competitor.get('prices', {})
+                if prices:
+                    prices_list = []
+                    for key, value in prices.items():
+                        if isinstance(value, bool):
+                            if value:
+                                prices_list.append(f"**{key.replace('_', ' ').title()}**: Disponibil")
+                        else:
+                            prices_list.append(f"**{key.replace('_', ' ').title()}**: {value} RON")
+                    st.markdown("\n".join([f"- {p}" for p in prices_list]))
+                
+                # Servicii
+                st.markdown("##### 🎯 Servicii Oferite")
+                services = competitor.get('services', [])
+                if services:
+                    st.markdown("\n".join([f"- {s}" for s in services]))
+                
+                # Poziționare
+                st.markdown("##### 📊 Poziționare")
+                st.info(competitor.get('positioning', 'N/A'))
+                
+                # Clienți
+                st.markdown("##### 👥 Detalii Clienți")
+                clients_info = competitor.get('clients', {})
+                if clients_info:
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric("Total Membri/Clienți", clients_info.get('total_members', 'N/A'))
+                        st.write(f"**Tipologie:** {clients_info.get('typology', 'N/A')}")
+                    with col2:
+                        st.write(f"**Ore de vârf:** {clients_info.get('peak_hours', 'N/A')}")
+                        st.write(f"**Rata de retenție:** {clients_info.get('retention_rate', 'N/A')}")
+                
+                # Antrenori/Terapeuți
+                trainers_key = 'trainers' if 'trainers' in competitor else 'therapists' if 'therapists' in competitor else 'instructors'
+                trainers = competitor.get(trainers_key, [])
+                if trainers:
+                    st.markdown(f"##### 👨‍🏫 {'Antrenori' if trainers_key == 'trainers' else 'Terapeuți' if trainers_key == 'therapists' else 'Instructori'}")
+                    trainers_df = pd.DataFrame([
+                        {
+                            'Nume': t.get('name', 'N/A'),
+                            'Specializare': t.get('specialization', 'N/A'),
+                            'Instagram': t.get('instagram', 'N/A') if t.get('instagram') else 'N/A'
+                        }
+                        for t in trainers
+                    ])
+                    st.dataframe(trainers_df, use_container_width=True, hide_index=True)
+    
+    # Secțiune 11: Analiză Social Media
+    st.markdown('<div id="analiza-social-media"></div>', unsafe_allow_html=True)
+    st.markdown("### 📱 Analiză Social Media - Prezența Concurenților pe Instagram")
+    
+    social_summary = get_social_media_summary()
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Followers (toți concurenții)", f"{social_summary['total_followers']:,}")
+    with col2:
+        st.metric("Concurenți cu Instagram", social_summary['total_competitors_with_instagram'])
+    with col3:
+        st.metric("Engagement Rate Mediu", f"{social_summary.get('avg_engagement_rate', 0):.2f}%")
+    with col4:
+        st.metric("Postări/Săptămână (medie)", f"{social_summary.get('avg_posts_per_week', 0):.1f}")
+    
+    # Analiză detaliată pe categorii
+    st.markdown("#### 📊 Analiză pe Categorii")
+    
+    category_social_data = []
+    for category, cat_data in social_summary.get('by_category', {}).items():
+        if cat_data['competitors_count'] > 0:
+            category_social_data.append({
+                'Categorie': category_names.get(category, category),
+                'Total Followers': cat_data['total_followers'],
+                'Număr Concurenți': cat_data['competitors_count'],
+                'Engagement Rate Mediu (%)': round(cat_data.get('avg_engagement', 0), 2),
+                'Postări/Săptămână (medie)': round(cat_data.get('avg_posts', 0), 1)
+            })
+    
+    if category_social_data:
+        category_social_df = pd.DataFrame(category_social_data)
+        st.dataframe(category_social_df, use_container_width=True, hide_index=True)
+    
+    # Analiză detaliată pentru fiecare competitor
+    st.markdown("#### 🔍 Analiză Detaliată per Competitor")
+    
+    all_competitors = []
+    for category, competitors in all_competitors_data.items():
+        for comp in competitors:
+            social = comp.get('social_media', {}).get('instagram', {})
+            if social:
+                all_competitors.append({
+                    'Competitor': comp['name'],
+                    'Categorie': category_names.get(category, category),
+                    'Instagram Handle': social.get('handle', 'N/A'),
+                    'Followers': social.get('followers', 0),
+                    'Postări/Săptămână': social.get('posts_per_week', 0),
+                    'Engagement Rate (%)': social.get('engagement_rate', 0),
+                    'Tipuri de Conținut': ', '.join(social.get('content_types', []))
+                })
+    
+    if all_competitors:
+        competitors_social_df = pd.DataFrame(all_competitors)
+        competitors_social_df = competitors_social_df.sort_values('Followers', ascending=False)
+        st.dataframe(competitors_social_df, use_container_width=True, hide_index=True)
+        
+        # Grafic comparativ followers
+        fig_followers = px.bar(
+            competitors_social_df,
+            x='Competitor',
+            y='Followers',
+            color='Categorie',
+            title='Număr de Followers pe Instagram - Comparație',
+            labels={'Followers': 'Număr Followers', 'Competitor': 'Competitor'}
+        )
+        fig_followers.update_layout(height=500, xaxis_tickangle=-45)
+        st.plotly_chart(fig_followers, use_container_width=True)
+        
+        # Grafic engagement rate
+        fig_engagement = px.bar(
+            competitors_social_df,
+            x='Competitor',
+            y='Engagement Rate (%)',
+            color='Categorie',
+            title='Engagement Rate pe Instagram - Comparație',
+            labels={'Engagement Rate (%)': 'Engagement Rate (%)', 'Competitor': 'Competitor'}
+        )
+        fig_engagement.update_layout(height=500, xaxis_tickangle=-45)
+        st.plotly_chart(fig_engagement, use_container_width=True)
+    
+    # Postări populare
+    st.markdown("#### ⭐ Cele Mai Populare Postări")
+    
+    for category, competitors in all_competitors_data.items():
+        for comp in competitors:
+            social = comp.get('social_media', {}).get('instagram', {})
+            top_posts = social.get('top_posts', [])
+            if top_posts:
+                with st.expander(f"**{comp['name']}** - Top {len(top_posts)} Postări"):
+                    for idx, post in enumerate(top_posts, 1):
+                        st.markdown(f"""
+                        **#{idx}** - {post.get('description', 'N/A')}
+                        - 👍 {post.get('likes', 0)} like-uri
+                        - 💬 {post.get('comments', 0)} comentarii
+                        """)
+    
+    st.markdown("---")
     st.markdown('<div id="concluzie-strategica"></div>', unsafe_allow_html=True)
     st.markdown("""
     **Concluzie Strategică:**
     
     Analiza per locație confirmă că majoritatea sălilor mari din zonă funcționează constant la sau peste limita optimă de confort. 
     Noua sală nu concurează cu acestea pe volum sau preț, ci ocupă un gol clar de piață, definit de control, calitate și proximitate.
+    
+    **Insights din Analiza Completă:**
+    - Piața din Bacău este foarte diversificată, de la săli mari de fitness până la centre specializate pe terapii alternative
+    - Există o oportunitate clară de a combina servicii de fitness cu servicii de recuperare și wellness
+    - Prezența pe social media variază semnificativ între concurenți, oferind oportunități de diferențiere
+    - Engagement-ul pe Instagram este mai ridicat pentru centrele specializate (yoga, pilates, terapii) decât pentru sălile mari de fitness
     """)
     
     # Secțiune 11: Recomandări
