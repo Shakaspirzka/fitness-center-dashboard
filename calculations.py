@@ -453,3 +453,158 @@ def compare_scenarios(
     
     return pd.DataFrame(results)
 
+
+# Previziuni financiare - Mobilis Vita (din fișierul Word)
+FINANCIAL_FORECAST = {
+    'spaces': [
+        {
+            'id': 'sala_clase',
+            'name': 'Sală clase',
+            'hours_per_day': 12,
+            'revenue_per_hour': 100,  # RON
+            'days_per_month': 24,
+            'occupancy_pessimistic': 0.30,  # 30%
+            'occupancy_maximum': 1.00,  # 100%
+            'monthly_revenue_pessimistic': 8640,  # RON
+            'monthly_revenue_maximum': 28800  # RON
+        },
+        {
+            'id': 'sala_fitness',
+            'name': 'Sală fitness',
+            'hours_per_day': 12,
+            'revenue_per_hour': 80,  # RON
+            'days_per_month': 24,
+            'occupancy_pessimistic': 0.30,  # 30%
+            'occupancy_maximum': 1.00,  # 100%
+            'monthly_revenue_pessimistic': 6912,  # RON
+            'monthly_revenue_maximum': 23040  # RON
+        },
+        {
+            'id': 'sala_terapii_1',
+            'name': 'Sală terapii 1',
+            'hours_per_day': 12,
+            'revenue_per_hour': 80,  # RON
+            'days_per_month': 24,
+            'occupancy_pessimistic': 0.30,  # 30%
+            'occupancy_maximum': 1.00,  # 100%
+            'monthly_revenue_pessimistic': 6912,  # RON
+            'monthly_revenue_maximum': 23040  # RON
+        },
+        {
+            'id': 'sala_terapii_2',
+            'name': 'Sală terapii 2',
+            'hours_per_day': 12,
+            'revenue_per_hour': 80,  # RON
+            'days_per_month': 24,
+            'occupancy_pessimistic': 0.30,  # 30%
+            'occupancy_maximum': 1.00,  # 100%
+            'monthly_revenue_pessimistic': 6912,  # RON
+            'monthly_revenue_maximum': 23040  # RON
+        },
+        {
+            'id': 'sala_terapii_3',
+            'name': 'Sală terapii 3',
+            'hours_per_day': 12,
+            'revenue_per_hour': 80,  # RON
+            'days_per_month': 24,
+            'occupancy_pessimistic': 0.30,  # 30%
+            'occupancy_maximum': 1.00,  # 100%
+            'monthly_revenue_pessimistic': 6912,  # RON
+            'monthly_revenue_maximum': 23040  # RON
+        }
+    ],
+    'capacity': {
+        'max_per_hour': 20,  # 20-22 persoane max/oră
+        'breakdown': {
+            'terapii_individuale': 2,
+            'sala_clase': 12,
+            'sala_fitness': 6  # 6-8 persoane
+        }
+    },
+    'expenses': {
+        'salaries': {
+            'high_salary_count': 3,
+            'high_salary_amount': 4850,  # RON/lună
+            'low_salary_count': 1,
+            'low_salary_amount': 2800,  # RON/lună
+            'total_monthly': 3 * 4850 + 1 * 2800  # 17350 RON
+        },
+        'rent': {
+            'amount_eur': 900,
+            'exchange_rate': 5.0,  # RON/EUR (ajustabil)
+            'amount_ron': 900 * 5.0  # 4500 RON (ajustabil)
+        },
+        'utilities': {
+            'winter_min': 1500,  # RON/lună
+            'winter_max': 2000,  # RON/lună
+            'average': 1750  # RON/lună
+        }
+    }
+}
+
+def get_financial_forecast_summary() -> Dict:
+    """
+    Returnează un rezumat al previziunilor financiare
+    """
+    total_revenue_pessimistic = sum(space['monthly_revenue_pessimistic'] for space in FINANCIAL_FORECAST['spaces'])
+    total_revenue_maximum = sum(space['monthly_revenue_maximum'] for space in FINANCIAL_FORECAST['spaces'])
+    
+    total_expenses = (
+        FINANCIAL_FORECAST['expenses']['salaries']['total_monthly'] +
+        FINANCIAL_FORECAST['expenses']['rent']['amount_ron'] +
+        FINANCIAL_FORECAST['expenses']['utilities']['average']
+    )
+    
+    profit_pessimistic = total_revenue_pessimistic - total_expenses
+    profit_maximum = total_revenue_maximum - total_expenses
+    
+    return {
+        'total_revenue': {
+            'pessimistic': total_revenue_pessimistic,
+            'maximum': total_revenue_maximum
+        },
+        'total_expenses': total_expenses,
+        'profit': {
+            'pessimistic': profit_pessimistic,
+            'maximum': profit_maximum
+        },
+        'break_even_occupancy': total_expenses / total_revenue_maximum if total_revenue_maximum > 0 else 0,
+        'spaces': FINANCIAL_FORECAST['spaces'],
+        'expenses_detail': FINANCIAL_FORECAST['expenses'],
+        'capacity': FINANCIAL_FORECAST['capacity']
+    }
+
+def get_financial_forecast_by_space() -> pd.DataFrame:
+    """
+    Returnează un DataFrame cu previziunile financiare pe spațiu
+    """
+    data = []
+    for space in FINANCIAL_FORECAST['spaces']:
+        data.append({
+            'Spațiu': space['name'],
+            'Ore/Zi': space['hours_per_day'],
+            'Venit Mediu/Oră (RON)': space['revenue_per_hour'],
+            'Zile/Lună': space['days_per_month'],
+            'Ocupare Pesimist (%)': f"{space['occupancy_pessimistic']*100:.0f}%",
+            'Ocupare Maxim (%)': f"{space['occupancy_maximum']*100:.0f}%",
+            'Venit/Lună Pesimist (RON)': space['monthly_revenue_pessimistic'],
+            'Venit/Lună Maxim (RON)': space['monthly_revenue_maximum']
+        })
+    
+    # Adaugă total
+    total_pessimistic = sum(s['monthly_revenue_pessimistic'] for s in FINANCIAL_FORECAST['spaces'])
+    total_maximum = sum(s['monthly_revenue_maximum'] for s in FINANCIAL_FORECAST['spaces'])
+    
+    data.append({
+        'Spațiu': 'TOTAL',
+        'Ore/Zi': '',
+        'Venit Mediu/Oră (RON)': '',
+        'Zile/Lună': '',
+        'Ocupare Pesimist (%)': '',
+        'Ocupare Maxim (%)': '',
+        'Venit/Lună Pesimist (RON)': total_pessimistic,
+        'Venit/Lună Maxim (RON)': total_maximum
+    })
+    
+    return pd.DataFrame(data)
+

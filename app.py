@@ -20,7 +20,9 @@ from calculations import (
     LOCATION,
     COMPETITORS,
     CAPACITY_PER_HOUR,
-    COMPETITOR_LOCATIONS
+    COMPETITOR_LOCATIONS,
+    get_financial_forecast_summary,
+    get_financial_forecast_by_space
 )
 from competitor_analysis import (
     get_competitive_positioning,
@@ -292,7 +294,7 @@ with col4:
     )
 
 # Tabs pentru diferite vizualizări
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
     "📊 Rezumat", 
     "💰 Venituri", 
     "👥 Clienți & Demografie", 
@@ -300,7 +302,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "🗺️ Hartă Participare",
     "🎯 Campanie",
     "🏆 Analiză Concurențială",
-    "📘 Scopul și Arhitectura Dashboard"
+    "📘 Scopul și Arhitectura Dashboard",
+    "💵 Previziuni Financiare"
 ])
 
 with tab1:
@@ -3090,6 +3093,247 @@ with tab8:
     **Document creat pentru a ajuta utilizatorii noi să înțeleagă nu doar "cum" funcționează dashboard-ul, ci și "de ce" a fost construit așa și "ce" înseamnă fiecare calcul.**
     
     **Succes în utilizarea dashboard-ului! 🚀**
+    """)
+
+# Tab 9: Previziuni Financiare
+with tab9:
+    st.markdown("""
+    # 💵 Previziuni Financiare - Mobilis Vita
+    
+    Această secțiune prezintă previziunile financiare bazate pe datele reale ale proiectului.
+    """)
+    
+    forecast_summary = get_financial_forecast_summary()
+    forecast_df = get_financial_forecast_by_space()
+    
+    # Metrici principale
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            "Venit Total/Lună (Pesimist)",
+            f"{forecast_summary['total_revenue']['pessimistic']:,.0f} RON",
+            help="Venit total în scenariul pesimist (30% ocupare)"
+        )
+    
+    with col2:
+        st.metric(
+            "Venit Total/Lună (Maxim)",
+            f"{forecast_summary['total_revenue']['maximum']:,.0f} RON",
+            help="Venit total în scenariul maxim (100% ocupare)"
+        )
+    
+    with col3:
+        st.metric(
+            "Cheltuieli Totale/Lună",
+            f"{forecast_summary['total_expenses']:,.0f} RON",
+            help="Cheltuieli totale: salarii + chirie + utilități"
+        )
+    
+    with col4:
+        profit_pessimistic = forecast_summary['profit']['pessimistic']
+        profit_maximum = forecast_summary['profit']['maximum']
+        st.metric(
+            "Profit/Lună (Pesimist)",
+            f"{profit_pessimistic:,.0f} RON",
+            delta=f"Maxim: {profit_maximum:,.0f} RON" if profit_maximum > 0 else None,
+            help="Profit în scenariul pesimist"
+        )
+    
+    # Break-even analysis
+    st.markdown("### 📊 Analiză Break-Even")
+    
+    break_even_occupancy = forecast_summary['break_even_occupancy']
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.info(f"""
+        **Ocupare minimă pentru break-even:**
+        
+        {break_even_occupancy*100:.1f}% din capacitate maximă
+        
+        **Explicație:**
+        - Cheltuieli totale: {forecast_summary['total_expenses']:,.0f} RON/lună
+        - Venit maxim: {forecast_summary['total_revenue']['maximum']:,.0f} RON/lună
+        - Pentru a acoperi cheltuielile, trebuie să atingi cel puțin {break_even_occupancy*100:.1f}% ocupare
+        """)
+    
+    with col2:
+        # Grafic break-even
+        occupancy_levels = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        revenues = [r * forecast_summary['total_revenue']['maximum'] for r in occupancy_levels]
+        profits = [r - forecast_summary['total_expenses'] for r in revenues]
+        
+        fig_break_even = go.Figure()
+        fig_break_even.add_trace(go.Scatter(
+            x=[o*100 for o in occupancy_levels],
+            y=revenues,
+            mode='lines+markers',
+            name='Venituri',
+            line=dict(color='green', width=3)
+        ))
+        fig_break_even.add_trace(go.Scatter(
+            x=[o*100 for o in occupancy_levels],
+            y=[forecast_summary['total_expenses']] * len(occupancy_levels),
+            mode='lines',
+            name='Cheltuieli (fixe)',
+            line=dict(color='red', width=2, dash='dash')
+        ))
+        fig_break_even.add_hline(
+            y=0,
+            line_dash="dot",
+            line_color="gray",
+            annotation_text="Break-even"
+        )
+        fig_break_even.update_layout(
+            title="Analiză Break-Even: Venituri vs Cheltuieli",
+            xaxis_title="Ocupare (%)",
+            yaxis_title="Sumă (RON)",
+            height=400
+        )
+        st.plotly_chart(fig_break_even, use_container_width=True)
+    
+    # Tabel detaliat pe spații
+    st.markdown("### 📋 Previziuni pe Spații")
+    st.dataframe(forecast_df, use_container_width=True, hide_index=True)
+    
+    # Grafic comparativ venituri
+    st.markdown("### 📈 Comparare Venituri: Pesimist vs Maxim")
+    
+    spaces_data = []
+    for space in forecast_summary['spaces']:
+        spaces_data.append({
+            'Spațiu': space['name'],
+            'Venit Pesimist (RON)': space['monthly_revenue_pessimistic'],
+            'Venit Maxim (RON)': space['monthly_revenue_maximum']
+        })
+    
+    spaces_df = pd.DataFrame(spaces_data)
+    
+    fig_revenues = go.Figure()
+    fig_revenues.add_trace(go.Bar(
+        x=spaces_df['Spațiu'],
+        y=spaces_df['Venit Pesimist (RON)'],
+        name='Venit Pesimist (30% ocupare)',
+        marker_color='orange'
+    ))
+    fig_revenues.add_trace(go.Bar(
+        x=spaces_df['Spațiu'],
+        y=spaces_df['Venit Maxim (RON)'],
+        name='Venit Maxim (100% ocupare)',
+        marker_color='green'
+    ))
+    fig_revenues.update_layout(
+        title="Venituri Lunare pe Spațiu - Comparație Scenarii",
+        xaxis_title="Spațiu",
+        yaxis_title="Venit (RON)",
+        barmode='group',
+        height=500,
+        xaxis_tickangle=-45
+    )
+    st.plotly_chart(fig_revenues, use_container_width=True)
+    
+    # Detalii cheltuieli
+    st.markdown("### 💸 Detalii Cheltuieli")
+    
+    expenses = forecast_summary['expenses_detail']
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("#### 💼 Salarii")
+        st.write(f"**{expenses['salaries']['high_salary_count']}x** {expenses['salaries']['high_salary_amount']:,.0f} RON = {expenses['salaries']['high_salary_count'] * expenses['salaries']['high_salary_amount']:,.0f} RON")
+        st.write(f"**{expenses['salaries']['low_salary_count']}x** {expenses['salaries']['low_salary_amount']:,.0f} RON = {expenses['salaries']['low_salary_count'] * expenses['salaries']['low_salary_amount']:,.0f} RON")
+        st.metric("Total Salarii", f"{expenses['salaries']['total_monthly']:,.0f} RON/lună")
+    
+    with col2:
+        st.markdown("#### 🏠 Chirie")
+        exchange_rate = st.number_input(
+            "Curs EUR/RON",
+            min_value=4.5,
+            max_value=5.5,
+            value=expenses['rent']['exchange_rate'],
+            step=0.1,
+            key="exchange_rate_input"
+        )
+        rent_ron = expenses['rent']['amount_eur'] * exchange_rate
+        st.write(f"**{expenses['rent']['amount_eur']} EUR** × {exchange_rate:.2f} = **{rent_ron:,.0f} RON/lună**")
+        st.metric("Chirie", f"{rent_ron:,.0f} RON/lună")
+    
+    with col3:
+        st.markdown("#### ⚡ Utilități (Iarnă)")
+        st.write(f"**Minim:** {expenses['utilities']['winter_min']:,.0f} RON/lună")
+        st.write(f"**Maxim:** {expenses['utilities']['winter_max']:,.0f} RON/lună")
+        st.metric("Medie Utilități", f"{expenses['utilities']['average']:,.0f} RON/lună")
+    
+    # Recalculare cu chirie actualizată
+    total_expenses_updated = (
+        expenses['salaries']['total_monthly'] +
+        rent_ron +
+        expenses['utilities']['average']
+    )
+    
+    profit_pessimistic_updated = forecast_summary['total_revenue']['pessimistic'] - total_expenses_updated
+    profit_maximum_updated = forecast_summary['total_revenue']['maximum'] - total_expenses_updated
+    
+    st.markdown("### 💰 Rezumat Financiar Actualizat")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Cheltuieli Totale", f"{total_expenses_updated:,.0f} RON/lună")
+    
+    with col2:
+        st.metric(
+            "Profit Pesimist",
+            f"{profit_pessimistic_updated:,.0f} RON/lună",
+            delta=f"{profit_pessimistic_updated - forecast_summary['profit']['pessimistic']:,.0f} RON" if profit_pessimistic_updated != forecast_summary['profit']['pessimistic'] else None
+        )
+    
+    with col3:
+        st.metric(
+            "Profit Maxim",
+            f"{profit_maximum_updated:,.0f} RON/lună",
+            delta=f"{profit_maximum_updated - forecast_summary['profit']['maximum']:,.0f} RON" if profit_maximum_updated != forecast_summary['profit']['maximum'] else None
+        )
+    
+    # Capacitate
+    st.markdown("### 👥 Capacitate Spațiu")
+    
+    capacity_info = forecast_summary.get('capacity', {})
+    if capacity_info:
+        st.info(f"""
+        **Capacitate maximă/oră:** {capacity_info.get('max_per_hour', 'N/A')} persoane
+        
+        **Distribuție:**
+        - Terapii individuale: {capacity_info.get('breakdown', {}).get('terapii_individuale', 'N/A')} persoane
+        - Sală clase: {capacity_info.get('breakdown', {}).get('sala_clase', 'N/A')} persoane
+        - Sală fitness: {capacity_info.get('breakdown', {}).get('sala_fitness', 'N/A')} persoane (6-8 persoane)
+        """)
+    
+    # Insights
+    st.markdown("### 💡 Insights Cheie")
+    
+    if profit_pessimistic_updated < 0:
+        st.warning(f"""
+        ⚠️ **Atenție:** În scenariul pesimist (30% ocupare), profitul este negativ: **{profit_pessimistic_updated:,.0f} RON/lună**
+        
+        **Recomandări:**
+        - Focalizează-te pe atingerea a cel puțin {break_even_occupancy*100:.1f}% ocupare pentru break-even
+        - Consideră strategii de marketing pentru a crește ocuparea
+        - Optimizează cheltuielile dacă este posibil
+        """)
+    else:
+        st.success(f"""
+        ✅ **Scenariul pesimist este profitabil:** {profit_pessimistic_updated:,.0f} RON/lună
+        
+        **Potențial maxim:** {profit_maximum_updated:,.0f} RON/lună la 100% ocupare
+        """)
+    
+    st.info(f"""
+    **Break-even ocupare:** {break_even_occupancy*100:.1f}%
+    
+    **Marja de siguranță (scenariul pesimist):** {((forecast_summary['total_revenue']['pessimistic'] / total_expenses_updated - 1) * 100):.1f}% peste break-even
     """)
 
 # Footer
