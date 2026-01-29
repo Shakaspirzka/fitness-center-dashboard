@@ -361,11 +361,19 @@ header_paths = [
 ]
 
 header_b64 = None
+header_loaded_path = None
 for path in header_paths:
     if os.path.exists(path):
         header_b64 = load_image(path)
         if header_b64:
+            header_loaded_path = path
             break
+
+# Debug: verifică dacă imaginea s-a încărcat (poate fi șters după)
+if header_loaded_path:
+    st.sidebar.success(f"✅ Header încărcat: {header_loaded_path}")
+else:
+    st.sidebar.warning("⚠️ Header-ul complet nu s-a încărcat, se folosește fallback")
 
 if header_b64:
     st.markdown(f"""
