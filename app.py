@@ -199,9 +199,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Header
-# Header-ul a fost eliminat - se folosește doar imaginea header-ului complet
-st.markdown(f"### 📍 Locație: {LOCATION['address']}, {LOCATION['city']}")
+# Header - eliminat, se folosește doar imaginea header-ului complet
+# Locația este afișată sub imaginea header-ului
 
 # Sidebar - Filtre
 st.sidebar.header("⚙️ Parametri Analiză")
