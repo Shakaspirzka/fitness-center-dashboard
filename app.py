@@ -372,10 +372,13 @@ for path in header_paths:
 # Afișează header-ul complet dacă există
 if header_b64:
     st.markdown(f"""
-    <div style="text-align: center; margin: 0 0 30px 0; padding: 0;">
+    <div style="text-align: center; margin: 0 0 20px 0; padding: 0;">
         <img src="data:image/png;base64,{header_b64}" style="max-width: 100%; width: 100%; height: auto; display: block;" />
     </div>
     """, unsafe_allow_html=True)
+
+# Locație sub header
+st.markdown(f"### 📍 Locație: {LOCATION['address']}, {LOCATION['city']}")
 
 # Tabs pentru diferite vizualizări
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
