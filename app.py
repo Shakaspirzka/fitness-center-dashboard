@@ -2196,9 +2196,9 @@ with tab7:
         'terapii': '🧘 Clase de Mișcare și Terapii'
     }
     
-    # Label cu font mai mare
+    # Label cu font mai mare și culoare portocalie
     st.markdown("""
-    <div style="font-size: 1.2em; font-weight: 500; margin-bottom: 10px; color: #333;">
+    <div style="font-size: 1.2em; font-weight: 500; margin-bottom: 10px; color: #ff8c00;">
         Selectează categoria pentru analiză detaliată:
     </div>
     """, unsafe_allow_html=True)
