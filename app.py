@@ -353,23 +353,33 @@ with col4:
         help="Rata de ocupare pentru scenariul selectat"
     )
 
-# Header cu logo Mobilis Vita+
-logo_path = "images/logo_mobilis_vita.png"
-logo_b64 = load_image(logo_path)
-if logo_b64:
+# Header complet cu logo și branding Mobilis Vita+
+header_path = "images/header_complet.png"
+header_b64 = load_image(header_path)
+if header_b64:
     st.markdown(f"""
-    <div style="text-align: center; margin: 20px 0 30px 0;">
-        <img src="data:image/png;base64,{logo_b64}" style="max-width: 300px; width: 100%; height: auto;" />
+    <div style="text-align: center; margin: 0 0 30px 0; padding: 0;">
+        <img src="data:image/png;base64,{header_b64}" style="max-width: 100%; width: 100%; height: auto; display: block;" />
     </div>
     """, unsafe_allow_html=True)
-
-st.markdown("""
-<div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #2ecc71; margin-bottom: 10px; font-size: 2.5em;">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>
-    <h2 style="color: #2ecc71; margin-bottom: 10px; font-size: 1.8em;">Mobilis Vita+</h2>
-    <p style="font-size: 1.2em; color: #666; font-style: italic;">Entry-point pentru mișcare • Family-friendly • Fără judecăți</p>
-</div>
-""", unsafe_allow_html=True)
+else:
+    # Fallback dacă imaginea nu există
+    logo_path = "images/logo_mobilis_vita.png"
+    logo_b64 = load_image(logo_path)
+    if logo_b64:
+        st.markdown(f"""
+        <div style="text-align: center; margin: 20px 0 30px 0;">
+            <img src="data:image/png;base64,{logo_b64}" style="max-width: 300px; width: 100%; height: auto;" />
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #2ecc71; margin-bottom: 10px; font-size: 2.5em;">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>
+        <h2 style="color: #2ecc71; margin-bottom: 10px; font-size: 1.8em;">Mobilis Vita+</h2>
+        <p style="font-size: 1.2em; color: #666; font-style: italic;">Entry-point pentru mișcare • Family-friendly • Fără judecăți</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Tabs pentru diferite vizualizări
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
