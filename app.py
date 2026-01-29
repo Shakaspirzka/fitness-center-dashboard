@@ -1908,8 +1908,32 @@ with tab7:
     
     with col1:
         st.markdown(f"**Suprafață totală:** {layout_recommended['total_area_m2']} mp")
-        st.markdown(f"**Capacitate țintă:** {layout_recommended['target_capacity']['min']}-{layout_recommended['target_capacity']['max']} persoane")
-        st.markdown(f"**mp/om țintă:** {layout_recommended['m2_per_person_range']['min']}-{layout_recommended['m2_per_person_range']['max']} mp/om")
+        st.markdown(f"**Sala Fitness:** {layout_recommended.get('fitness_area_m2', 'N/A')} mp")
+        st.markdown(f"**Sala Clase:** {layout_recommended.get('classes_area_m2', 'N/A')} mp")
+        
+        # Capacitate țintă - structură nouă pentru Mobilis Vita
+        target_capacity = layout_recommended.get('target_capacity', {})
+        if 'total_simultaneous' in target_capacity:
+            total_cap = target_capacity['total_simultaneous']
+            st.markdown(f"**Capacitate țintă totală:** {total_cap.get('min', 'N/A')}-{total_cap.get('max', 'N/A')} persoane (optimal: {total_cap.get('optimal', 'N/A')})")
+            if 'fitness_simultaneous' in target_capacity:
+                fitness_cap = target_capacity['fitness_simultaneous']
+                st.markdown(f"  - Sala Fitness: {fitness_cap.get('min', 'N/A')}-{fitness_cap.get('max', 'N/A')} persoane")
+            if 'classes_simultaneous' in target_capacity:
+                classes_cap = target_capacity['classes_simultaneous']
+                st.markdown(f"  - Sala Clase: {classes_cap.get('min', 'N/A')}-{classes_cap.get('max', 'N/A')} persoane")
+        else:
+            # Fallback pentru structura veche (dacă există)
+            if 'min' in target_capacity and 'max' in target_capacity:
+                st.markdown(f"**Capacitate țintă:** {target_capacity['min']}-{target_capacity['max']} persoane")
+        
+        # mp/om țintă
+        m2_per_person = layout_recommended.get('m2_per_person_range', {})
+        if 'overall' in m2_per_person:
+            overall = m2_per_person['overall']
+            st.markdown(f"**mp/om țintă (overall):** {overall.get('min', 'N/A')}-{overall.get('max', 'N/A')} mp/om (optimal: {overall.get('optimal', 'N/A')})")
+        elif 'min' in m2_per_person and 'max' in m2_per_person:
+            st.markdown(f"**mp/om țintă:** {m2_per_person['min']}-{m2_per_person['max']} mp/om")
     
     with col2:
         # Grafic distribuție spațiu
