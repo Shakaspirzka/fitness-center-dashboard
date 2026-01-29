@@ -369,25 +369,11 @@ for path in header_paths:
             header_loaded_path = path
             break
 
-# Debug: verifică dacă imaginea s-a încărcat (poate fi șters după)
-if header_loaded_path:
-    st.sidebar.success(f"✅ Header încărcat: {header_loaded_path}")
-else:
-    st.sidebar.warning("⚠️ Header-ul complet nu s-a încărcat, se folosește fallback")
-
+# Afișează header-ul complet dacă există
 if header_b64:
     st.markdown(f"""
     <div style="text-align: center; margin: 0 0 30px 0; padding: 0;">
         <img src="data:image/png;base64,{header_b64}" style="max-width: 100%; width: 100%; height: auto; display: block;" />
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    # Fallback dacă imaginea nu există - afișează doar textul
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #2ecc71; margin-bottom: 10px; font-size: 2.5em;">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>
-        <h2 style="color: #2ecc71; margin-bottom: 10px; font-size: 1.8em;">Mobilis Vita+</h2>
-        <p style="font-size: 1.2em; color: #666; font-style: italic;">Entry-point pentru mișcare • Family-friendly • Fără judecăți</p>
     </div>
     """, unsafe_allow_html=True)
 
