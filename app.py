@@ -48,6 +48,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Funcție helper pentru culori abonamente
+def get_subscription_colors():
+    """
+    Returnează un dicționar cu culori pentru fiecare tip de abonament
+    """
+    colors = {
+        'clase_miscare': '#2ecc71',  # verde
+        'fitness_access': '#3498db',  # albastru
+        'complet': '#e74c3c',  # roșu
+        'family': '#f39c12',  # portocaliu
+        'masaj': '#9b59b6',  # mov
+        'kineto': '#1abc9c'  # turcoaz
+    }
+    return {SUBSCRIPTION_TYPES[k]['name']: colors[k] for k in colors if k in SUBSCRIPTION_TYPES}
+
 # Funcție helper pentru cuprins (fără imagine de fundal)
 def create_table_of_contents(title, items):
     """
@@ -168,59 +183,73 @@ selected_scenario = st.sidebar.selectbox(
     index=1  # Default: Mediu
 )
 
-# Distribuție servicii - Structură extinsă (toate formează 100%)
+# Distribuție servicii - Mobilis Vita (toate formează 100%)
 st.sidebar.subheader("Distribuție Servicii (%)")
-st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. PT/Reabilitare ocupă slot-uri ca orice alt serviciu.")
+st.sidebar.caption("💡 **Notă:** Valorile se normalizează automat la 100%. Serviciile per sesiune ocupă slot-uri ca orice alt serviciu.")
 
-# Toate serviciile (inclusiv PT) formează 100%
-basic_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['basic']['name']} ({SUBSCRIPTION_TYPES['basic']['price']} RON/lună)",
-    0, 100, 40, 5,
-    help=SUBSCRIPTION_TYPES['basic']['description']
+# Toate serviciile formează 100%
+clase_miscare_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['clase_miscare']['name']} ({SUBSCRIPTION_TYPES['clase_miscare']['price']} RON/lună)",
+    0, 100, 50, 5,
+    help=SUBSCRIPTION_TYPES['clase_miscare']['description']
 )
-standard_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['standard']['name']} ({SUBSCRIPTION_TYPES['standard']['price']} RON/lună)",
-    0, 100, 40, 5,
-    help=SUBSCRIPTION_TYPES['standard']['description']
+fitness_access_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['fitness_access']['name']} ({SUBSCRIPTION_TYPES['fitness_access']['price']} RON/lună)",
+    0, 100, 20, 5,
+    help=SUBSCRIPTION_TYPES['fitness_access']['description']
 )
-premium_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['premium']['name']} ({SUBSCRIPTION_TYPES['premium']['price']} RON/lună)",
+complet_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['complet']['name']} ({SUBSCRIPTION_TYPES['complet']['price']} RON/lună)",
     0, 100, 15, 5,
-    help=SUBSCRIPTION_TYPES['premium']['description']
+    help=SUBSCRIPTION_TYPES['complet']['description']
 )
-pt_pct = st.sidebar.slider(
-    f"{SUBSCRIPTION_TYPES['pt_session']['name']} ({SUBSCRIPTION_TYPES['pt_session']['price']} RON/sesiune)",
+family_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['family']['name']} ({SUBSCRIPTION_TYPES['family']['price']} RON/lună)",
     0, 100, 5, 5,
-    help=f"{SUBSCRIPTION_TYPES['pt_session']['description']}. Fiecare sesiune ocupă 1 slot."
+    help=SUBSCRIPTION_TYPES['family']['description']
+)
+masaj_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['masaj']['name']} ({SUBSCRIPTION_TYPES['masaj']['price']} RON/sesiune)",
+    0, 100, 5, 5,
+    help=f"{SUBSCRIPTION_TYPES['masaj']['description']}. Fiecare sesiune ocupă 1 slot."
+)
+kineto_pct = st.sidebar.slider(
+    f"{SUBSCRIPTION_TYPES['kineto']['name']} ({SUBSCRIPTION_TYPES['kineto']['price']} RON/sesiune)",
+    0, 100, 5, 5,
+    help=f"{SUBSCRIPTION_TYPES['kineto']['description']}. Fiecare sesiune ocupă 1 slot."
 )
 
 # Normalizare distribuție (toate serviciile formează 100%)
-total_pct = basic_pct + standard_pct + premium_pct + pt_pct
+total_pct = clase_miscare_pct + fitness_access_pct + complet_pct + family_pct + masaj_pct + kineto_pct
 if total_pct == 0:
-    basic_pct, standard_pct, premium_pct, pt_pct = 40, 40, 15, 5
+    clase_miscare_pct, fitness_access_pct, complet_pct, family_pct, masaj_pct, kineto_pct = 50, 20, 15, 5, 5, 5
     total_pct = 100
 
 # Calculează procentajele normalizate
-basic_normalized = (basic_pct / total_pct) * 100
-standard_normalized = (standard_pct / total_pct) * 100
-premium_normalized = (premium_pct / total_pct) * 100
-pt_normalized = (pt_pct / total_pct) * 100
+clase_miscare_normalized = (clase_miscare_pct / total_pct) * 100
+fitness_access_normalized = (fitness_access_pct / total_pct) * 100
+complet_normalized = (complet_pct / total_pct) * 100
+family_normalized = (family_pct / total_pct) * 100
+masaj_normalized = (masaj_pct / total_pct) * 100
+kineto_normalized = (kineto_pct / total_pct) * 100
 
 # Afișează procentajele normalizate
 if total_pct != 100:
-    st.sidebar.info(f"📊 **Distribuție normalizată:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}% | PT {pt_normalized:.1f}%")
+    st.sidebar.info(f"📊 **Distribuție normalizată:** Clase {clase_miscare_normalized:.1f}% | Fitness {fitness_access_normalized:.1f}% | Complet {complet_normalized:.1f}% | Family {family_normalized:.1f}% | Masaj {masaj_normalized:.1f}% | Kineto {kineto_normalized:.1f}%")
 else:
-    st.sidebar.success(f"✅ **Distribuție:** Basic {basic_normalized:.1f}% | Standard {standard_normalized:.1f}% | Premium {premium_normalized:.1f}% | PT {pt_normalized:.1f}%")
+    st.sidebar.success(f"✅ **Distribuție:** Clase {clase_miscare_normalized:.1f}% | Fitness {fitness_access_normalized:.1f}% | Complet {complet_normalized:.1f}% | Family {family_normalized:.1f}% | Masaj {masaj_normalized:.1f}% | Kineto {kineto_normalized:.1f}%")
 
-# Explicație PT
-if pt_normalized > 0:
-    st.sidebar.caption(f"💡 **PT/Reabilitare:** {pt_normalized:.1f}% din slot-uri ocupate = sesiuni PT/lună (calculat automat din ocupare)")
+# Explicație servicii per sesiune
+if masaj_normalized > 0 or kineto_normalized > 0:
+    st.sidebar.caption(f"💡 **Servicii per sesiune:** Masaj {masaj_normalized:.1f}% | Kineto {kineto_normalized:.1f}% din slot-uri ocupate = sesiuni/lună (calculat automat din ocupare)")
 
 subscription_distribution = {
-    'basic': basic_pct / total_pct,
-    'standard': standard_pct / total_pct,
-    'premium': premium_pct / total_pct,
-    'pt_session': pt_pct / total_pct
+    'clase_miscare': clase_miscare_pct / total_pct,
+    'fitness_access': fitness_access_pct / total_pct,
+    'complet': complet_pct / total_pct,
+    'family': family_pct / total_pct,
+    'masaj': masaj_pct / total_pct,
+    'kineto': kineto_pct / total_pct
 }
 
 # Parametri demografici
@@ -376,12 +405,7 @@ with tab1:
             x='Tip Abonament',
             y='Număr Clienți',
             color='Tip Abonament',
-            color_discrete_map={
-                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
-                SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
-                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
-            }
+            color_discrete_map=get_subscription_colors()
         )
         fig_clients.update_layout(showlegend=False, height=300)
         st.plotly_chart(fig_clients, use_container_width=True)
@@ -582,8 +606,8 @@ with tab2:
         st.markdown('<div id="distributie-venituri"></div>', unsafe_allow_html=True)
         # Grafic venituri pe tip abonament
         revenue_data = analysis['revenue']
-        # Obține doar tipurile cu venit > 0
-        active_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
+        # Obține doar tipurile cu venit > 0 (din toate tipurile disponibile)
+        active_types = [k for k in SUBSCRIPTION_TYPES.keys() 
                        if k in revenue_data and revenue_data.get(k, 0) > 0]
         
         revenue_df = pd.DataFrame({
@@ -597,12 +621,7 @@ with tab2:
             names='Tip Abonament',
             title="Distribuție Venituri pe Tip Abonament",
             color='Tip Abonament',
-            color_discrete_map={
-                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
-                SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
-                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
-            }
+            color_discrete_map=get_subscription_colors()
         )
         st.plotly_chart(fig_revenue, use_container_width=True)
     
@@ -665,18 +684,22 @@ with tab3:
         st.markdown('<div id="necesar-clienti"></div>', unsafe_allow_html=True)
         st.markdown("### Necesar Clienți")
         clients_data = analysis['revenue']['clients']
-        active_client_types = [k for k in ['basic', 'standard', 'premium', 'pt_session'] 
+        # Obține toate tipurile active din clients_data care există în SUBSCRIPTION_TYPES
+        active_client_types = [k for k in SUBSCRIPTION_TYPES.keys() 
                               if k in clients_data and clients_data.get(k, 0) > 0]
         
-        # Pentru PT, afișăm și numărul de sesiuni
+        # Pentru serviciile per sesiune, afișăm și numărul de sesiuni
         display_data = []
         for k in active_client_types:
             name = SUBSCRIPTION_TYPES[k]['name']
             clients_count = clients_data.get(k, 0)
+            sub_info = SUBSCRIPTION_TYPES[k]
             
-            if k == 'pt_session':
-                # Pentru PT, afișăm clienți și sesiuni
-                sessions_count = clients_data.get('pt_session_sessions', clients_count * 5)
+            # Verifică dacă este serviciu per sesiune
+            if sub_info.get('is_session_based', False):
+                # Pentru servicii per sesiune, afișăm clienți și sesiuni
+                sessions_key = f'{k}_sessions'
+                sessions_count = clients_data.get(sessions_key, clients_count * 5)
                 display_data.append({
                     'Tip Abonament': name,
                     'Număr Clienți': clients_count,
@@ -700,12 +723,7 @@ with tab3:
             y='Număr Clienți',
             text='Label',
             color='Tip Abonament',
-            color_discrete_map={
-                SUBSCRIPTION_TYPES['basic']['name']: '#2ecc71',
-                SUBSCRIPTION_TYPES['standard']['name']: '#3498db',
-                SUBSCRIPTION_TYPES['premium']['name']: '#e74c3c',
-                SUBSCRIPTION_TYPES['pt_session']['name']: '#9b59b6'
-            }
+            color_discrete_map=get_subscription_colors()
         )
         fig_clients_detailed.update_traces(textposition='outside')
         fig_clients_detailed.update_layout(
@@ -716,9 +734,12 @@ with tab3:
         )
         st.plotly_chart(fig_clients_detailed, use_container_width=True)
         
-        # Tabel detaliat cu sesiuni PT
-        if 'pt_session' in active_client_types:
-            st.info(f"💡 **PT/Reabilitare:** {clients_data.get('pt_session', 0)} clienți × ~5 sesiuni/lună = {clients_data.get('pt_session_sessions', 0)} sesiuni/lună")
+        # Tabel detaliat cu sesiuni pentru serviciile per sesiune
+        session_based_types = [k for k in active_client_types if SUBSCRIPTION_TYPES[k].get('is_session_based', False)]
+        for k in session_based_types:
+            sessions_key = f'{k}_sessions'
+            sessions_count = clients_data.get(sessions_key, 0)
+            st.info(f"💡 **{SUBSCRIPTION_TYPES[k]['name']}:** {clients_data.get(k, 0)} clienți × ~5 sesiuni/lună = {sessions_count} sesiuni/lună")
     
     with col2:
         st.markdown('<div id="parametri-demografici"></div>', unsafe_allow_html=True)
