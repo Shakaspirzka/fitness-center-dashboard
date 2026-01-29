@@ -42,7 +42,7 @@ from competitor_analysis import (
 
 # Configurare pagină
 st.set_page_config(
-    page_title="Mobilis Vita+ - Analiză Potențial Spațiu Fitness - Bacau",
+    page_title="💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare",
     page_icon="💪",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -365,7 +365,8 @@ if logo_b64:
 
 st.markdown("""
 <div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #2ecc71; margin-bottom: 10px;">Mobilis Vita+</h1>
+    <h1 style="color: #2ecc71; margin-bottom: 10px; font-size: 2.5em;">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>
+    <h2 style="color: #2ecc71; margin-bottom: 10px; font-size: 1.8em;">Mobilis Vita+</h2>
     <p style="font-size: 1.2em; color: #666; font-style: italic;">Entry-point pentru mișcare • Family-friendly • Fără judecăți</p>
 </div>
 """, unsafe_allow_html=True)
@@ -2187,11 +2188,19 @@ with tab7:
         'terapii': '🧘 Clase de Mișcare și Terapii'
     }
     
+    # Label cu font mai mare
+    st.markdown("""
+    <div style="font-size: 1.2em; font-weight: 500; margin-bottom: 10px; color: #333;">
+        Selectează categoria pentru analiză detaliată:
+    </div>
+    """, unsafe_allow_html=True)
+    
     selected_category = st.selectbox(
-        "Selectează categoria pentru analiză detaliată:",
+        "",
         options=list(category_names.keys()),
         format_func=lambda x: category_names[x],
-        key="competitor_category_selector"
+        key="competitor_category_selector",
+        label_visibility="collapsed"
     )
     
     competitors_in_category = get_competitors_by_category(selected_category)
