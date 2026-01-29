@@ -200,7 +200,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Header
-st.markdown('<h1 class="main-header">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>', unsafe_allow_html=True)
+# Header-ul a fost eliminat - se folosește doar imaginea header-ului complet
 st.markdown(f"### 📍 Locație: {LOCATION['address']}, {LOCATION['city']}")
 
 # Sidebar - Filtre
