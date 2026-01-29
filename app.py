@@ -354,8 +354,19 @@ with col4:
     )
 
 # Header complet cu logo și branding Mobilis Vita+
-header_path = "images/header_complet.png"
-header_b64 = load_image(header_path)
+# Încearcă mai multe căi pentru a găsi imaginea (local și Streamlit Cloud)
+header_paths = [
+    "images/header_complet.png",  # Cale relativă (Streamlit Cloud)
+    r"C:\Users\D\Desktop\Folder\consult\mircea coach\fitness_center_dashboard\images\header_complet.png"  # Fallback local
+]
+
+header_b64 = None
+for path in header_paths:
+    if os.path.exists(path):
+        header_b64 = load_image(path)
+        if header_b64:
+            break
+
 if header_b64:
     st.markdown(f"""
     <div style="text-align: center; margin: 0 0 30px 0; padding: 0;">
@@ -363,16 +374,7 @@ if header_b64:
     </div>
     """, unsafe_allow_html=True)
 else:
-    # Fallback dacă imaginea nu există
-    logo_path = "images/logo_mobilis_vita.png"
-    logo_b64 = load_image(logo_path)
-    if logo_b64:
-        st.markdown(f"""
-        <div style="text-align: center; margin: 20px 0 30px 0;">
-            <img src="data:image/png;base64,{logo_b64}" style="max-width: 300px; width: 100%; height: auto;" />
-        </div>
-        """, unsafe_allow_html=True)
-    
+    # Fallback dacă imaginea nu există - afișează doar textul
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2ecc71; margin-bottom: 10px; font-size: 2.5em;">💪 Dashboard Analiză Potențial Spațiu Fitness & Recuperare</h1>
