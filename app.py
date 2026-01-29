@@ -42,11 +42,42 @@ from competitor_analysis import (
 
 # Configurare pagină
 st.set_page_config(
-    page_title="Analiză Potențial Spațiu Fitness - Bacau",
+    page_title="Mobilis Vita+ - Analiză Potențial Spațiu Fitness - Bacau",
     page_icon="💪",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Funcție helper pentru încărcarea și afișarea imaginilor
+def load_image(image_path, max_width=800):
+    """
+    Încarcă o imagine și o returnează ca base64 pentru afișare în Streamlit
+    """
+    if os.path.exists(image_path):
+        try:
+            with open(image_path, "rb") as img_file:
+                img_bytes = img_file.read()
+                img_b64 = base64.b64encode(img_bytes).decode('utf-8')
+                return img_b64
+        except Exception as e:
+            st.warning(f"Nu s-a putut încărca imaginea {image_path}: {e}")
+            return None
+    return None
+
+def display_image(image_path, caption="", max_width=800):
+    """
+    Afișează o imagine în Streamlit
+    """
+    img_b64 = load_image(image_path)
+    if img_b64:
+        st.markdown(f"""
+        <div style="text-align: center; margin: 20px 0;">
+            <img src="data:image/png;base64,{img_b64}" style="max-width: {max_width}px; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+            {f'<p style="margin-top: 10px; color: #666; font-style: italic;">{caption}</p>' if caption else ''}
+        </div>
+        """, unsafe_allow_html=True)
+        return True
+    return False
 
 # Funcție helper pentru culori abonamente
 def get_subscription_colors():
@@ -322,6 +353,23 @@ with col4:
         help="Rata de ocupare pentru scenariul selectat"
     )
 
+# Header cu logo Mobilis Vita+
+logo_path = "images/logo_mobilis_vita.png"
+logo_b64 = load_image(logo_path)
+if logo_b64:
+    st.markdown(f"""
+    <div style="text-align: center; margin: 20px 0 30px 0;">
+        <img src="data:image/png;base64,{logo_b64}" style="max-width: 300px; width: 100%; height: auto;" />
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("""
+<div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="color: #2ecc71; margin-bottom: 10px;">Mobilis Vita+</h1>
+    <p style="font-size: 1.2em; color: #666; font-style: italic;">Entry-point pentru mișcare • Family-friendly • Fără judecăți</p>
+</div>
+""", unsafe_allow_html=True)
+
 # Tabs pentru diferite vizualizări
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
     "📊 Rezumat", 
@@ -341,6 +389,7 @@ with tab1:
     # Cuprins pentru tab Rezumat
     toc_items = [
         ("intro-model", "💡 Introducere - Modelul de Gândire"),
+        ("galerie-imagini", "🖼️ Galerie Imagini - Mobilis Vita+"),
         ("capacitate-spatiu", "📊 Capacitate Spațiu"),
         ("distributie-abonamente", "💳 Distribuție Abonamente"),
         ("clienti-tip", "👥 Clienți pe Tip Abonament"),
@@ -362,6 +411,38 @@ with tab1:
     Toate calculele se actualizează automat când ajustezi parametrii din sidebar. 
     Pentru detalii complete despre logica de calcul, vezi secțiunea expandabilă de mai jos sau tab-ul "📘 Scopul și Arhitectura Dashboard".
     """)
+    
+    # Secțiune Galerie Imagini
+    st.markdown('<div id="galerie-imagini"></div>', unsafe_allow_html=True)
+    st.markdown("### 🖼️ Galerie Imagini - Mobilis Vita+")
+    st.markdown("""
+    **Descoperă spațiul nostru:** Un mediu modern, family-friendly, dedicat mișcării și sănătății pentru toate vârstele.
+    """)
+    
+    # Galerie cu imagini organizate
+    gallery_images = [
+        ("images/spatiu_interior_1.png", "Spațiu interior modern - Zonă de mișcare și fitness"),
+        ("images/clase_copii.png", "Clase de mișcare pentru copii - Family-friendly"),
+        ("images/receptie_perete_verde.png", "Zonă de recepție cu perete verde - Primire caldă"),
+        ("images/spatiu_interior_2.png", "Spațiu interior cu zonă pentru copii - Versatil și modern"),
+        ("images/instructor_copil.png", "Ghidare personalizată - Fără judecăți, cu suport"),
+        ("images/grup_miscare.png", "Clase de mișcare pentru toate vârstele - Comunitate"),
+        ("images/clase_toate_varstele.png", "Inclusivitate - De la copii la bunici"),
+        ("images/zona_asteptare_neon.png", "Zonă de așteptare modernă - Design contemporan"),
+        ("images/receptie_logo.png", "Recepție cu branding Mobilis Vita+"),
+        ("images/spatiu_interior_3.png", "Spațiu interior - Design modern și funcțional")
+    ]
+    
+    # Afișează imagini în grid 2 coloane
+    for i in range(0, len(gallery_images), 2):
+        cols = st.columns(2)
+        for j, col in enumerate(cols):
+            if i + j < len(gallery_images):
+                img_path, caption = gallery_images[i + j]
+                with col:
+                    display_image(img_path, caption, max_width=600)
+    
+    st.markdown("---")
     
     col1, col2 = st.columns(2)
     
@@ -1643,6 +1724,13 @@ with tab7:
     st.markdown("### 🎯 Poziționare Strategică")
     st.info(f"**{positioning['positioning']}**")
     
+    # Imagini ilustrative pentru poziționare
+    col_img1, col_img2 = st.columns(2)
+    with col_img1:
+        display_image("images/instructor_copil.png", "Ghidare personalizată - Fără judecăți, cu suport", max_width=500)
+    with col_img2:
+        display_image("images/clase_copii.png", "Family-friendly - Clase pentru copii", max_width=500)
+    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -2317,6 +2405,13 @@ with tab7:
     - ✅ Bunici care doresc mișcare blândă
     - ✅ Persoanelor care nu se simt confortabile în săli tradiționale
     """)
+    
+    # Imagini ilustrative pentru poziționare
+    col_img1, col_img2 = st.columns(2)
+    with col_img1:
+        display_image("images/clase_toate_varstele.png", "Inclusivitate - Toate vârstele sunt binevenite", max_width=500)
+    with col_img2:
+        display_image("images/grup_miscare.png", "Comunitate - Mișcare împreună", max_width=500)
     
     # 2. Capacitate și spațiu
     st.markdown("#### 📐 2. Capacitate și spațiu - Dimensiuni Reale")
