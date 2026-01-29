@@ -380,7 +380,7 @@ if header_b64:
 st.markdown(f"### 📍 Locație: {LOCATION['address']}, {LOCATION['city']}")
 
 # Tabs pentru diferite vizualizări
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
     "📊 Rezumat", 
     "💰 Venituri", 
     "👥 Clienți & Demografie", 
@@ -389,7 +389,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
     "🎯 Campanie",
     "🏆 Analiză Concurențială",
     "📘 Scopul și Arhitectura Dashboard",
-    "💵 Previziuni Financiare"
+    "💵 Previziuni Financiare",
+    "📋 Colectare Date"
 ])
 
 with tab1:
@@ -3491,6 +3492,363 @@ with tab9:
     **Break-even ocupare:** {break_even_occupancy*100:.1f}%
     
     **Marja de siguranță (scenariul pesimist):** {((forecast_summary['total_revenue']['pessimistic'] / total_expenses_updated - 1) * 100):.1f}% peste break-even
+    """)
+
+# Tab 10: Colectare Date și Metodologie
+with tab10:
+    st.markdown("""
+    # 📋 Colectare Date și Metodologie
+    
+    Această secțiune explică de unde provin datele folosite în dashboard și cum pot fi actualizate cu informații reale.
+    """)
+    
+    # Cuprins
+    toc_items = [
+        ("sursa-date", "📊 Sursa Datelor"),
+        ("date-social-media", "📱 Date Social Media"),
+        ("date-concurenti", "🏢 Date Concurenți"),
+        ("date-financiare", "💵 Date Financiare"),
+        ("actualizare-date", "🔄 Cum să Actualizezi Datele"),
+        ("metodologie", "📐 Metodologie de Colectare")
+    ]
+    st.markdown(create_table_of_contents("📑 Cuprins", toc_items), unsafe_allow_html=True)
+    
+    # Secțiune 1: Sursa Datelor
+    st.markdown('<div id="sursa-date"></div>', unsafe_allow_html=True)
+    st.markdown("### 📊 Sursa Datelor")
+    
+    st.warning("""
+    ⚠️ **IMPORTANT:** Datele prezentate în acest dashboard sunt **exemple/placeholder** pentru a demonstra funcționalitatea.
+    
+    Pentru utilizare reală, toate datele trebuie înlocuite cu informații reale obținute prin:
+    - Cercetare de piață
+    - Vizite la locațiile concurenților
+    - Analiză social media manuală sau automatizată
+    - Interviuri și sondaje
+    - Date publice disponibile
+    """)
+    
+    st.markdown("""
+    **Tipuri de date folosite în dashboard:**
+    
+    1. **Date despre concurenți** - Locații, prețuri, servicii, capacitate
+    2. **Date social media** - Followers, engagement, tipuri de conținut
+    3. **Date financiare** - Venituri, cheltuieli, previziuni
+    4. **Date demografice** - Densitate populație, rate de participare
+    5. **Date despre spațiu** - Dimensiuni, capacitate, layout
+    """)
+    
+    # Secțiune 2: Date Social Media
+    st.markdown('<div id="date-social-media"></div>', unsafe_allow_html=True)
+    st.markdown("### 📱 Date Social Media - Cum Sunt Obținute")
+    
+    st.markdown("""
+    **Datele despre social media (Instagram) prezentate în dashboard sunt exemple/placeholder.**
+    
+    Pentru a obține date reale, poți folosi următoarele metode:
+    """)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        #### 🔍 Metode Manuale
+        
+        **1. Vizitare directă pe Instagram:**
+        - Accesează profilul competitorului pe Instagram
+        - Notează numărul de followers (afișat sub nume)
+        - Numără postările din ultimele 7 zile pentru "Postări/Săptămână"
+        - Identifică tipurile de conținut (foto, video, stories, reels)
+        
+        **2. Calculare Engagement Rate:**
+        ```
+        Engagement Rate = (Likes + Comentarii) / Followers × 100
+        ```
+        - Selectează 5-10 postări recente
+        - Adună like-urile și comentariile
+        - Calculează media și împarte la numărul de followers
+        
+        **3. Identificare Postări Populare:**
+        - Sortează postările după numărul de like-uri
+        - Notează top 3 postări cu cele mai multe like-uri și comentarii
+        - Analizează ce tip de conținut funcționează cel mai bine
+        """)
+    
+    with col2:
+        st.markdown("""
+        #### 🤖 Metode Automatizate (Avansate)
+        
+        **1. Instagram API (Instagram Basic Display API):**
+        - Necesită autentificare și aprobare
+        - Permite acces la date publice
+        - Limitări: rate limiting, nevoie de token de acces
+        
+        **2. Scraping (cu precauție):**
+        - **⚠️ ATENȚIE:** Verifică termenii și condițiile Instagram
+        - Poate fi împotriva ToS-ului Instagram
+        - Folosește doar pentru date publice și cu permisiune
+        
+        **3. Tool-uri terțe:**
+        - **Social Blade** - Statistici publice despre followers
+        - **Hootsuite Analytics** - Pentru conturi proprii
+        - **Sprout Social** - Analiză social media
+        - **Later** - Planificare și analiză
+        
+        **4. Servicii de analiză:**
+        - Servicii specializate de analiză social media
+        - Rapoarte de piață care includ date despre concurenți
+        """)
+    
+    st.info("""
+    💡 **Recomandare:** Pentru început, folosește metodele manuale pentru a obține date precise și actualizate. 
+    Datele manuale sunt de obicei mai precise decât cele automatizate și îți oferă o înțelegere mai bună a strategiei competitorului.
+    """)
+    
+    # Secțiune 3: Date Concurenți
+    st.markdown('<div id="date-concurenti"></div>', unsafe_allow_html=True)
+    st.markdown("### 🏢 Date Concurenți - Metodologie de Colectare")
+    
+    st.markdown("""
+    **Pentru a obține date reale despre concurenți, urmează acești pași:**
+    """)
+    
+    st.markdown("""
+    #### 📍 1. Locații și Coordonate
+    
+    **Metode:**
+    - **Google Maps** - Caută numele sălii și notează adresa exactă
+    - **GPS Coordinates** - Click dreapta pe locație în Google Maps → "Coordonate"
+    - **Vizitare fizică** - Verifică adresa și notează coordonatele
+    - **Google My Business** - Informații despre locație și program
+    
+    **Exemplu:**
+    - Caută "RedGym Bacău" pe Google Maps
+    - Notează adresa completă
+    - Obține coordonatele GPS (latitudine, longitudine)
+    """)
+    
+    st.markdown("""
+    #### 💰 2. Prețuri Practicate
+    
+    **Metode:**
+    - **Vizitare fizică** - Cel mai precis mod
+    - **Website-ul competitorului** - Multe săli afișează prețurile online
+    - **Telefon** - Sună și întreabă despre prețuri și pachete
+    - **Facebook/Instagram** - Multe săli postează promoții cu prețuri
+    - **Google My Business** - Uneori include informații despre prețuri
+    
+    **Ce să notezi:**
+    - Preț abonament lunar standard
+    - Preț abonament student (dacă există)
+    - Preț abonament anual
+    - Preț sesiune PT/antrenor personal
+    - Pachete speciale sau promoții
+    """)
+    
+    st.markdown("""
+    #### 🎯 3. Servicii Oferte
+    
+    **Metode:**
+    - **Website-ul competitorului** - Secțiunea "Servicii" sau "Oferte"
+    - **Broșuri/Flyers** - Dacă sunt disponibile
+    - **Vizitare fizică** - Observă ce servicii sunt oferite
+    - **Recenzii online** - Google Reviews, Facebook - clienții menționează serviciile
+    
+    **Ce să notezi:**
+    - Tipuri de echipamente (cardio, forță, funcțional)
+    - Cursuri de grup disponibile
+    - Servicii speciale (masaj, nutriție, etc.)
+    - Program de funcționare
+    - Acces 24/7 sau program limitat
+    """)
+    
+    st.markdown("""
+    #### 👥 4. Detalii Clienți (Număr, Tipologie)
+    
+    **Metode (mai dificil de obținut):**
+    - **Observație directă** - Vizitează la ore diferite și estimează numărul de oameni
+    - **Recenzii online** - Clienții menționează adesea aglomerația sau liniștea
+    - **Social media** - Uneori sălile postează numărul de membri (aniversări, milestone-uri)
+    - **Google My Business** - Uneori afișează numărul de recenzii (poate indica popularitatea)
+    
+    **Tipologie clienți:**
+    - Observă vârsta și genul oamenilor la vizitări
+    - Analizează recenziile pentru a identifica tipul de clienți
+    - Verifică dacă există programe speciale (studenți, seniori, etc.)
+    """)
+    
+    st.markdown("""
+    #### 👨‍🏫 5. Antrenori/Terapeuți
+    
+    **Metode:**
+    - **Website-ul competitorului** - Secțiunea "Echipa" sau "Antrenori"
+    - **Facebook/Instagram** - Postări despre antrenori
+    - **LinkedIn** - Caută antrenori care lucrează la sală
+    - **Vizitare fizică** - Observă cine lucrează acolo
+    
+    **Ce să notezi:**
+    - Numele antrenorilor/terapeuților
+    - Specializările (dacă sunt menționate)
+    - Pagini personale de social media (dacă sunt publice)
+    """)
+    
+    # Secțiune 4: Date Financiare
+    st.markdown('<div id="date-financiare"></div>', unsafe_allow_html=True)
+    st.markdown("### 💵 Date Financiare - Previziuni Mobilis Vita")
+    
+    st.markdown("""
+    **Datele financiare din tab-ul "Previziuni Financiare" provin din:**
+    
+    - **Fișierul Word** furnizat de client: "Previziuni financiare Mobilis Vita"
+    - **Date reale** despre:
+        - Venituri estimate pe spațiu (Sală clase, Sală fitness, Săli terapii)
+        - Cheltuieli (salarii, chirie, utilități)
+        - Capacitate maximă
+    
+    **Aceste date sunt specifice proiectului Mobilis Vita** și au fost furnizate direct de client.
+    """)
+    
+    # Secțiune 5: Actualizare Date
+    st.markdown('<div id="actualizare-date"></div>', unsafe_allow_html=True)
+    st.markdown("### 🔄 Cum să Actualizezi Datele")
+    
+    st.markdown("""
+    **Pentru a actualiza datele cu informații reale:**
+    """)
+    
+    st.markdown("""
+    #### 📝 1. Actualizare Date Concurenți
+    
+    **Fișier:** `competitor_analysis.py`
+    
+    **Structura:** `EXTENDED_COMPETITOR_DATA`
+    
+    **Pași:**
+    1. Deschide fișierul `competitor_analysis.py`
+    2. Găsește secțiunea `EXTENDED_COMPETITOR_DATA`
+    3. Pentru fiecare competitor, actualizează:
+       - `locations` - Adrese și coordonate reale
+       - `prices` - Prețuri reale obținute
+       - `services` - Lista reală de servicii
+       - `clients` - Informații despre clienți (dacă sunt disponibile)
+       - `trainers` / `therapists` / `instructors` - Nume și specializări reale
+       - `social_media` - Date reale despre Instagram
+    
+    **Exemplu de actualizare:**
+    ```python
+    'social_media': {
+        'instagram': {
+            'handle': '@redgym_bacau',  # Handle real
+            'followers': 3500,  # Număr real de followers
+            'posts_per_week': 4,  # Număr real de postări/săptămână
+            'engagement_rate': 3.2,  # Calculat real: (likes+comments)/followers*100
+            'content_types': ['Workout videos', 'Transformations'],  # Tipuri reale
+            'top_posts': [
+                {'description': 'Post real', 'likes': 450, 'comments': 32}  # Date reale
+            ]
+        }
+    }
+    ```
+    """)
+    
+    st.markdown("""
+    #### 📊 2. Actualizare Date Financiare
+    
+    **Fișier:** `calculations.py`
+    
+    **Structura:** `FINANCIAL_FORECAST`
+    
+    **Pași:**
+    1. Deschide fișierul `calculations.py`
+    2. Găsește secțiunea `FINANCIAL_FORECAST`
+    3. Actualizează:
+       - `revenue_per_hour` - Venituri reale pe oră
+       - `occupancy_pessimistic` / `occupancy_maximum` - Rate reale de ocupare
+       - `expenses` - Cheltuieli reale (salarii, chirie, utilități)
+    
+    **Notă:** Datele financiare actuale provin din fișierul Word furnizat de client.
+    """)
+    
+    # Secțiune 6: Metodologie
+    st.markdown('<div id="metodologie"></div>', unsafe_allow_html=True)
+    st.markdown("### 📐 Metodologie Recomandată de Colectare")
+    
+    st.markdown("""
+    **Plan de acțiune recomandat pentru colectarea datelor:**
+    """)
+    
+    st.markdown("""
+    #### 📅 Faza 1: Cercetare Inițială (1-2 săptămâni)
+    
+    1. **Identificare concurenți:**
+       - Caută pe Google Maps "săli de fitness Bacău"
+       - Listează toate sălile din zonă
+       - Categorizează: fitness, kineto, masaj, terapii
+    
+    2. **Colectare date de bază:**
+       - Adrese și coordonate (Google Maps)
+       - Prețuri (website, telefon, vizitare)
+       - Servicii oferite (website, broșuri)
+    
+    3. **Analiză social media inițială:**
+       - Găsește conturile Instagram/Facebook
+       - Notează numărul de followers
+       - Identifică tipurile de conținut
+    """)
+    
+    st.markdown("""
+    #### 🔍 Faza 2: Cercetare Detaliată (2-3 săptămâni)
+    
+    1. **Vizite fizice:**
+       - Planifică vizite la fiecare competitor
+       - Observă dimensiunea spațiului
+       - Estimează capacitatea și ocuparea
+       - Notează tipurile de echipamente
+    
+    2. **Analiză social media detaliată:**
+       - Analizează 20-30 de postări recente
+       - Calculează engagement rate
+       - Identifică postările cele mai populare
+       - Notează frecvența postărilor
+    
+    3. **Interviuri (dacă este posibil):**
+       - Discuții cu clienții concurenților
+       - Feedback despre experiență
+       - Informații despre prețuri și servicii
+    """)
+    
+    st.markdown("""
+    #### 📊 Faza 3: Actualizare Periodică (Lunar/Trimestrial)
+    
+    1. **Monitorizare continuă:**
+       - Verifică dacă prețurile s-au schimbat
+       - Actualizează numărul de followers
+       - Monitorizează noile servicii oferite
+    
+    2. **Re-analiză social media:**
+       - Recalculează engagement rate
+       - Identifică noi trend-uri în conținut
+       - Actualizează top postări
+    """)
+    
+    st.markdown("""
+    #### 🛠️ Tool-uri Recomandate
+    
+    **Pentru colectare date:**
+    - **Google Maps** - Locații și coordonate
+    - **Google Sheets/Excel** - Organizare date
+    - **Instagram** - Analiză social media
+    - **Facebook Business Suite** - Analiză concurenți (dacă au pagini publice)
+    
+    **Pentru analiză:**
+    - **Social Blade** - Statistici Instagram (gratuit, limitat)
+    - **Hootsuite** - Analiză social media (plătit)
+    - **Google Analytics** - Pentru propriul website (dacă există)
+    """)
+    
+    st.success("""
+    ✅ **Concluzie:** Datele prezentate în dashboard sunt structurate pentru a fi ușor actualizate cu informații reale. 
+    Toate datele sunt stocate în fișiere Python (`competitor_analysis.py`, `calculations.py`) și pot fi modificate direct.
     """)
 
 # Footer
