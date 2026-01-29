@@ -3505,6 +3505,7 @@ with tab10:
     # Cuprins
     toc_items = [
         ("sursa-date", "📊 Sursa Datelor"),
+        ("date-mp", "📐 Date despre Suprafețe (mp)"),
         ("date-social-media", "📱 Date Social Media"),
         ("date-concurenti", "🏢 Date Concurenți"),
         ("date-financiare", "💵 Date Financiare"),
@@ -3518,9 +3519,21 @@ with tab10:
     st.markdown("### 📊 Sursa Datelor")
     
     st.warning("""
-    ⚠️ **IMPORTANT:** Datele prezentate în acest dashboard sunt **exemple/placeholder** pentru a demonstra funcționalitatea.
+    ⚠️ **IMPORTANT:** Multe datele prezentate în acest dashboard sunt **exemple/placeholder** pentru a demonstra funcționalitatea.
     
-    Pentru utilizare reală, toate datele trebuie înlocuite cu informații reale obținute prin:
+    **Date REALE (furnizate de client):**
+    - ✅ Dimensiuni Mobilis Vita: 65-70mp sala fitness, 50mp sala clase (furnizate de client)
+    - ✅ Previziuni financiare: Date din fișierul Word "Previziuni financiare Mobilis Vita"
+    - ✅ Locație: Strada Prieteniei nr 14, Bacău (confirmată)
+    
+    **Date PLACEHOLDER/ESTIMATE (trebuie actualizate):**
+    - ⚠️ Dimensiuni concurenți (mp) - Estimate bazate pe observații generale
+    - ⚠️ Date social media - Exemple pentru demonstrație
+    - ⚠️ Prețuri concurenți - Trebuie verificate
+    - ⚠️ Număr membri concurenți - Estimate
+    - ⚠️ Detalii antrenori/terapeuți - Exemple
+    
+    Pentru utilizare reală, datele placeholder trebuie înlocuite cu informații reale obținute prin:
     - Cercetare de piață
     - Vizite la locațiile concurenților
     - Analiză social media manuală sau automatizată
@@ -3531,11 +3544,76 @@ with tab10:
     st.markdown("""
     **Tipuri de date folosite în dashboard:**
     
-    1. **Date despre concurenți** - Locații, prețuri, servicii, capacitate
+    1. **Date despre concurenți** - Locații, prețuri, servicii, capacitate, **suprafețe (mp)**
     2. **Date social media** - Followers, engagement, tipuri de conținut
-    3. **Date financiare** - Venituri, cheltuieli, previziuni
+    3. **Date financiare** - Venituri, cheltuieli, previziuni (REALE pentru Mobilis Vita)
     4. **Date demografice** - Densitate populație, rate de participare
-    5. **Date despre spațiu** - Dimensiuni, capacitate, layout
+    5. **Date despre spațiu** - Dimensiuni, capacitate, layout (REALE pentru Mobilis Vita)
+    """)
+    
+    # Secțiune specifică despre datele despre mp
+    st.markdown('<div id="date-mp"></div>', unsafe_allow_html=True)
+    st.markdown("### 📐 Date despre Suprafețe (mp) - Ce Este Real și Ce Este Placeholder")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.success("""
+        **✅ DATE REALE - Mobilis Vita:**
+        
+        - **Sala de Fitness:** 65-70 mp (furnizat de client)
+        - **Sala de Clase:** 50 mp (furnizat de client)
+        - **Total:** ~115-120 mp
+        
+        Aceste date provin direct din feedback-ul clientului și sunt corecte.
+        """)
+    
+    with col2:
+        st.warning("""
+        **⚠️ DATE ESTIMATE/PLACEHOLDER - Concurenți:**
+        
+        - **RedGym:** 600-800 mp (estimate)
+        - **City Gym:** 1400-1500 mp (estimate)
+        - **Săli locale mici:** 300 mp (estimate)
+        - **Alți concurenți:** 200-400 mp (estimate)
+        
+        Aceste date sunt estimate bazate pe observații generale și trebuie verificate.
+        """)
+    
+    st.markdown("""
+    #### 🔍 Cum să Obții Date Reale despre Suprafețe (mp) pentru Concurenți
+    
+    **Metode:**
+    
+    1. **Vizitare fizică:**
+       - Cel mai precis mod
+       - Estimează dimensiunea prin observație
+       - Poți folosi aplicații de măsurare (dacă ai acces)
+    
+    2. **Google Maps / Street View:**
+       - Poți estima dimensiunea din imagini
+       - Compară cu obiecte cunoscute (mașini, oameni)
+       - Menționează că este o estimare
+    
+    3. **Website-ul competitorului:**
+       - Uneori sălile menționează suprafața în descrieri
+       - Verifică secțiunea "Despre Noi" sau "Facilități"
+    
+    4. **Google My Business:**
+       - Uneori include informații despre dimensiune
+       - Verifică secțiunea de detalii
+    
+    5. **Recenzii online:**
+       - Clienții menționează adesea "sală mare" sau "spațiu mic"
+       - Poți deduce dimensiunea relativă
+    
+    6. **Documente publice (dacă sunt disponibile):**
+       - Permise de construcție
+       - Anunțuri de închiriere (menționează adesea suprafața)
+       - Rapoarte de evaluare
+    
+    **Notă:** Pentru analiza comparativă, estimările sunt suficiente. 
+    Important este să ai o idee despre dimensiunea relativă (mic, mediu, mare) pentru comparații.
     """)
     
     # Secțiune 2: Date Social Media
